@@ -10,7 +10,7 @@ import { ProdutoModule } from './produto/produto.module';
 import { EnderecoModule } from './endereco/endereco.module';
 import { EstoqueModule } from './estoque/estoque.module';
 import { PedidoModule } from './pedido/pedido.module';
-import { ItemPedidoModule } from './item-pedido/item-pedido.module';
+import { ItemPedidoModule } from './itemPedido/itemPedido.module';
 import { PagamentoModule } from './pagamento/pagamento.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 

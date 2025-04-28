@@ -1,34 +1,57 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
-import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { UsuarioResponseDto } from './dto/usuarioResponseDto';
 
-@Controller('usuario')
+@Controller('usuarios')
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
   @Post()
-  create(@Body() createUsuarioDto: CreateUsuarioDto) {
-    return this.usuarioService.create(createUsuarioDto);
+  async create(@Body() createUsuarioDto: CreateUsuarioDto): Promise<UsuarioResponseDto> {
+    const usuario = await this.usuarioService.create(createUsuarioDto);
+    return {
+      id: usuario.id,
+      email: usuario.email,
+      papel: usuario.papel,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.usuarioService.findAll();
+  async findAll(): Promise<UsuarioResponseDto[]> {
+    const usuarios = await this.usuarioService.findAll();
+    return usuarios.map(usuario => ({
+      id: usuario.id,
+      email: usuario.email,
+      papel: usuario.papel,
+    }));
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usuarioService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<UsuarioResponseDto> {
+    const usuario = await this.usuarioService.findOne(id);
+    return {
+      id: usuario.id,
+      email: usuario.email,
+      papel: usuario.papel,
+    };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
-    return this.usuarioService.update(+id, updateUsuarioDto);
+  async update(
+    @Param('id') id: number,
+    @Body() updateUsuarioDto: Partial<CreateUsuarioDto>,
+  ): Promise<UsuarioResponseDto> {
+    const usuario = await this.usuarioService.update(id, updateUsuarioDto);
+    return {
+      id: usuario.id,
+      email: usuario.email,
+      papel: usuario.papel,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usuarioService.remove(+id);
+  async remove(@Param('id') id: number): Promise<void> {
+    await this.usuarioService.remove(id);
   }
 }

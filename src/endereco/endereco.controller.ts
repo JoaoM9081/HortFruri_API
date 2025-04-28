@@ -2,33 +2,65 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { EnderecoService } from './endereco.service';
 import { CreateEnderecoDto } from './dto/create-endereco.dto';
 import { UpdateEnderecoDto } from './dto/update-endereco.dto';
+import { EnderecoResponseDto } from './dto/EnderecoResponseDto';
 
-@Controller('endereco')
+@Controller('enderecos')
 export class EnderecoController {
   constructor(private readonly enderecoService: EnderecoService) {}
 
   @Post()
-  create(@Body() createEnderecoDto: CreateEnderecoDto) {
-    return this.enderecoService.create(createEnderecoDto);
+  async create(@Body() createEnderecoDto: CreateEnderecoDto): Promise<EnderecoResponseDto> {
+    const endereco = await this.enderecoService.create(createEnderecoDto);
+    return {
+      id: endereco.id,
+      rua: endereco.rua,
+      numero: endereco.numero,
+      cidade: endereco.cidade,
+      cep: endereco.cep,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.enderecoService.findAll();
+  async findAll(): Promise<EnderecoResponseDto[]> {
+    const enderecos = await this.enderecoService.findAll();
+    return enderecos.map((endereco) => ({
+      id: endereco.id,
+      rua: endereco.rua,
+      numero: endereco.numero,
+      cidade: endereco.cidade,
+      cep: endereco.cep,
+    }));
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.enderecoService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<EnderecoResponseDto> {
+    const endereco = await this.enderecoService.findOne(id);
+    return {
+      id: endereco.id,
+      rua: endereco.rua,
+      numero: endereco.numero,
+      cidade: endereco.cidade,
+      cep: endereco.cep,
+    };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEnderecoDto: UpdateEnderecoDto) {
-    return this.enderecoService.update(+id, updateEnderecoDto);
+  async update(
+    @Param('id') id: number,
+    @Body() updateEnderecoDto: UpdateEnderecoDto,
+  ): Promise<EnderecoResponseDto> {
+    const endereco = await this.enderecoService.update(id, updateEnderecoDto);
+    return {
+      id: endereco.id,
+      rua: endereco.rua,
+      numero: endereco.numero,
+      cidade: endereco.cidade,
+      cep: endereco.cep,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.enderecoService.remove(+id);
+  async remove(@Param('id') id: number): Promise<void> {
+    await this.enderecoService.remove(id);
   }
 }

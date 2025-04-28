@@ -1,26 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Endereco } from './entities/endereco.entity';
 import { CreateEnderecoDto } from './dto/create-endereco.dto';
-import { UpdateEnderecoDto } from './dto/update-endereco.dto';
 
 @Injectable()
 export class EnderecoService {
-  create(createEnderecoDto: CreateEnderecoDto) {
-    return 'This action adds a new endereco';
+  constructor(
+    @InjectRepository(Endereco)
+    private readonly repo: Repository<Endereco>,
+  ) {}
+
+  async create(dto: CreateEnderecoDto): Promise<Endereco> {
+    const e = this.repo.create(dto);
+    return this.repo.save(e);
   }
 
-  findAll() {
-    return `This action returns all endereco`;
+  findAll(): Promise<Endereco[]> {
+    return this.repo.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} endereco`;
+  async findOne(id: number): Promise<Endereco> {
+    const e = await this.repo.findOne({
+      where: { id },
+    });
+    if (!e) throw new NotFoundException(`Endereço ${id} não encontrado`);
+    return e;
+  }
+  
+  async update(id: number, dto: Partial<CreateEnderecoDto>): Promise<Endereco> {
+    await this.repo.update(id, dto);
+    return this.findOne(id);
   }
 
-  update(id: number, updateEnderecoDto: UpdateEnderecoDto) {
-    return `This action updates a #${id} endereco`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} endereco`;
+  async remove(id: number): Promise<void> {
+    await this.repo.delete(id);
   }
 }

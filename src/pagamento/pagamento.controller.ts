@@ -1,34 +1,65 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
 import { PagamentoService } from './pagamento.service';
 import { CreatePagamentoDto } from './dto/create-pagamento.dto';
-import { UpdatePagamentoDto } from './dto/update-pagamento.dto';
+import { PagamentoResponseDto } from './dto/pagamentoResponseDto';
 
-@Controller('pagamento')
+
+@Controller('pagamentos')
 export class PagamentoController {
   constructor(private readonly pagamentoService: PagamentoService) {}
 
-  @Post()
-  create(@Body() createPagamentoDto: CreatePagamentoDto) {
-    return this.pagamentoService.create(createPagamentoDto);
+  @Post(':pedidoId')
+  async create(
+    @Param('pedidoId') pedidoId: number,
+    @Body() createPagamentoDto: CreatePagamentoDto,
+  ): Promise<PagamentoResponseDto> {
+    const pagamento = await this.pagamentoService.create(pedidoId, createPagamentoDto);
+    return {
+      id: pagamento.id,
+      formaPagamento: pagamento.formaPagamento,
+      status: pagamento.status,
+      valorPago: pagamento.valorPago,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.pagamentoService.findAll();
+  async findAll(): Promise<PagamentoResponseDto[]> {
+    const pagamentos = await this.pagamentoService.findAll();
+    return pagamentos.map((pagamento) => ({
+      id: pagamento.id,
+      formaPagamento: pagamento.formaPagamento,
+      status: pagamento.status,
+      valorPago: pagamento.valorPago,
+    }));
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pagamentoService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<PagamentoResponseDto> {
+    const pagamento = await this.pagamentoService.findOne(id);
+    return {
+      id: pagamento.id,
+      formaPagamento: pagamento.formaPagamento,
+      status: pagamento.status,
+      valorPago: pagamento.valorPago,
+    };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePagamentoDto: UpdatePagamentoDto) {
-    return this.pagamentoService.update(+id, updatePagamentoDto);
+  async update(
+    @Param('id') id: number,
+    @Body() updatePagamentoDto: Partial<CreatePagamentoDto>,
+  ): Promise<PagamentoResponseDto> {
+    const pagamento = await this.pagamentoService.update(id, updatePagamentoDto);
+    return {
+      id: pagamento.id,
+      formaPagamento: pagamento.formaPagamento,
+      status: pagamento.status,
+      valorPago: pagamento.valorPago,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pagamentoService.remove(+id);
+  async remove(@Param('id') id: number): Promise<void> {
+    await this.pagamentoService.remove(id);
   }
 }

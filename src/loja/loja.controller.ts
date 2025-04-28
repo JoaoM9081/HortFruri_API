@@ -1,34 +1,76 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
 import { LojaService } from './loja.service';
 import { CreateLojaDto } from './dto/create-loja.dto';
-import { UpdateLojaDto } from './dto/update-loja.dto';
+import { LojaResponseDto } from './dto/LojaResponseDto';
 
-@Controller('loja')
+@Controller('lojas')
 export class LojaController {
   constructor(private readonly lojaService: LojaService) {}
 
   @Post()
-  create(@Body() createLojaDto: CreateLojaDto) {
-    return this.lojaService.create(createLojaDto);
+  async create(
+    @Param('usuarioId') usuarioId: number,
+    @Param('enderecoId') enderecoId: number,
+    @Body() createLojaDto: CreateLojaDto,
+  ): Promise<LojaResponseDto> {
+    const loja = await this.lojaService.create(usuarioId, enderecoId, createLojaDto);
+    return {
+      id: loja.id,
+      nome: loja.nome,
+      cnpj: loja.cnpj,
+      telefone: loja.telefone,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.lojaService.findAll();
+  async findAll(): Promise<LojaResponseDto[]> {
+    const lojas = await this.lojaService.findAll();
+    return lojas.map((loja) => ({
+      id: loja.id,
+      nome: loja.nome,
+      cnpj: loja.cnpj,
+      telefone: loja.telefone,
+    }));
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.lojaService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<LojaResponseDto> {
+    const loja = await this.lojaService.findOne(id);
+    return {
+      id: loja.id,
+      nome: loja.nome,
+      cnpj: loja.cnpj,
+      telefone: loja.telefone,
+    };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLojaDto: UpdateLojaDto) {
-    return this.lojaService.update(+id, updateLojaDto);
+  async update(
+    @Param('id') id: number,
+    @Body() updateLojaDto: Partial<CreateLojaDto>,
+  ): Promise<LojaResponseDto> {
+    const loja = await this.lojaService.update(id, updateLojaDto);
+    return {
+      id: loja.id,
+      nome: loja.nome,
+      cnpj: loja.cnpj,
+      telefone: loja.telefone,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.lojaService.remove(+id);
+  async remove(@Param('id') id: number): Promise<void> {
+    await this.lojaService.remove(id);
+  }
+
+  @Get('nome/:nome')
+  async findByName(@Param('nome') nome: string): Promise<LojaResponseDto> {
+    const loja = await this.lojaService.findByName(nome);
+    return {
+      id: loja.id,
+      nome: loja.nome,
+      cnpj: loja.cnpj,
+      telefone: loja.telefone,
+    };
   }
 }

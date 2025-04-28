@@ -1,34 +1,68 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
 import { EntregadorService } from './entregador.service';
 import { CreateEntregadorDto } from './dto/create-entregador.dto';
-import { UpdateEntregadorDto } from './dto/update-entregador.dto';
+import { EntregadorResponseDto } from './dto/entregadorResponseDto';
 
-@Controller('entregador')
+@Controller('entregadores')
 export class EntregadorController {
   constructor(private readonly entregadorService: EntregadorService) {}
 
   @Post()
-  create(@Body() createEntregadorDto: CreateEntregadorDto) {
-    return this.entregadorService.create(createEntregadorDto);
+  async create(
+    @Param('usuarioId') usuarioId: number,
+    @Body() createEntregadorDto: CreateEntregadorDto,
+  ): Promise<EntregadorResponseDto> {
+    const entregador = await this.entregadorService.create(usuarioId, createEntregadorDto);
+    return {
+      id: entregador.id,
+      nome: entregador.nome,
+      telefone: entregador.telefone,
+      veiculo: entregador.veiculo,
+      placa: entregador.placa,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.entregadorService.findAll();
+  async findAll(): Promise<EntregadorResponseDto[]> {
+    const entregadores = await this.entregadorService.findAll();
+    return entregadores.map((entregador) => ({
+      id: entregador.id,
+      nome: entregador.nome,
+      telefone: entregador.telefone,
+      veiculo: entregador.veiculo,
+      placa: entregador.placa,
+    }));
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.entregadorService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<EntregadorResponseDto> {
+    const entregador = await this.entregadorService.findOne(id);
+    return {
+      id: entregador.id,
+      nome: entregador.nome,
+      telefone: entregador.telefone,
+      veiculo: entregador.veiculo,
+      placa: entregador.placa,
+    };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEntregadorDto: UpdateEntregadorDto) {
-    return this.entregadorService.update(+id, updateEntregadorDto);
+  async update(
+    @Param('id') id: number,
+    @Body() updateEntregadorDto: Partial<CreateEntregadorDto>,
+  ): Promise<EntregadorResponseDto> {
+    const entregador = await this.entregadorService.update(id, updateEntregadorDto);
+    return {
+      id: entregador.id,
+      nome: entregador.nome,
+      telefone: entregador.telefone,
+      veiculo: entregador.veiculo,
+      placa: entregador.placa,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.entregadorService.remove(+id);
+  async remove(@Param('id') id: number): Promise<void> {
+    await this.entregadorService.remove(id);
   }
 }

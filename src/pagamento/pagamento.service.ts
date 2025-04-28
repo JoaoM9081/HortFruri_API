@@ -1,26 +1,45 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePagamentoDto } from './dto/create-pagamento.dto';
-import { UpdatePagamentoDto } from './dto/update-pagamento.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Pagamento } from './entities/pagamento.entity';
+import { CreatePagamentoDto, StatusPagamento } from './dto/create-pagamento.dto';
 
 @Injectable()
 export class PagamentoService {
-  create(createPagamentoDto: CreatePagamentoDto) {
-    return 'This action adds a new pagamento';
+  constructor(
+    @InjectRepository(Pagamento)
+    private readonly repo: Repository<Pagamento>,
+  ) {}
+
+  async create(
+    pedidoId: number,
+    dto: CreatePagamentoDto,
+  ): Promise<Pagamento> {
+    // O status é atribuído automaticamente como PENDENTE
+    const pagamento = this.repo.create({
+      ...dto,
+      pedido: { id: pedidoId },
+      status: StatusPagamento.PENDENTE, // Atribuindo o status PENDENTE ao criar
+    });
+    return this.repo.save(pagamento);
   }
 
-  findAll() {
-    return `This action returns all pagamento`;
+  findAll(): Promise<Pagamento[]> {
+    return this.repo.find({ relations: ['pedido'] });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} pagamento`;
+  async findOne(id: number): Promise<Pagamento> {
+    const pg = await this.repo.findOne({ where: { id }, relations: ['pedido'] });
+    if (!pg) throw new NotFoundException(`Pagamento ${id} não encontrado`);
+    return pg;
   }
 
-  update(id: number, updatePagamentoDto: UpdatePagamentoDto) {
-    return `This action updates a #${id} pagamento`;
+  async update(id: number, dto: Partial<CreatePagamentoDto>): Promise<Pagamento> {
+    await this.repo.update(id, dto);
+    return this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} pagamento`;
+  async remove(id: number): Promise<void> {
+    await this.repo.delete(id);
   }
 }
