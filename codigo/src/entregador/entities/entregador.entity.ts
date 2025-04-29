@@ -1,5 +1,4 @@
 import { Pedido } from "src/pedido/entities/pedido.entity";
-import { Usuario } from "src/usuario/entities/usuario.entity";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 
@@ -14,15 +13,17 @@ export class Entregador {
   @Column()
   telefone: string;
 
+  @Column({ unique: true })
+  email: string;
+
+  @Column()
+  senha: string;
+
   @Column()
   veiculo: string;
 
   @Column()
   placa: string;
-
-  @OneToOne(() => Usuario, { eager: true, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'usuarioId' })
-  usuario: Usuario;
 
   @OneToMany(() => Pedido, pedido => pedido.entregador, { onDelete: 'SET NULL' })
   pedidos: Pedido[];

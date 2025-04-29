@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsPhoneNumber, Matches, Length } from 'class-validator';
+import { IsString, IsPhoneNumber, IsEmail, Matches, Length, Min, MinLength } from 'class-validator';
 
 export class CreateLojaDto {
   @IsString()
@@ -14,4 +14,13 @@ export class CreateLojaDto {
   @IsPhoneNumber('BR')
   @ApiProperty()
   telefone: string;
+
+  @IsEmail()
+  @ApiProperty()
+  email: string;  
+
+  @IsString()
+  @ApiProperty()
+  @MinLength(6)
+  senha: string;  
 }

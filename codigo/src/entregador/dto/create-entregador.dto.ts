@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsPhoneNumber } from 'class-validator';
+import { IsString, IsPhoneNumber, IsEmail, Min, MinLength } from 'class-validator';
 
 export class CreateEntregadorDto {
   @IsString()
   @ApiProperty()
   nome: string;
 
-  @IsPhoneNumber('BR')
+  @IsPhoneNumber('BR', { message: 'Número de telefone inválido. O formato deve ser +55 [DDD] [Número]' })
   @ApiProperty()
   telefone: string;
 
@@ -17,4 +17,13 @@ export class CreateEntregadorDto {
   @IsString()
   @ApiProperty()
   placa: string;
+
+  @IsEmail()
+  @ApiProperty()
+  email: string;
+
+  @IsString()
+  @ApiProperty()
+  @MinLength(6)
+  senha: string;
 }

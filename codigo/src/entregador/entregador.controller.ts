@@ -7,18 +7,16 @@ import { EntregadorResponseDto } from './dto/entregadorResponseDto';
 export class EntregadorController {
   constructor(private readonly entregadorService: EntregadorService) {}
 
-  @Post('usuario/:usuarioId')
-  async create(
-    @Param('usuarioId', ParseIntPipe) usuarioId: number, 
-    @Body() createEntregadorDto: CreateEntregadorDto,
-  ): Promise<EntregadorResponseDto> {
-    const entregador = await this.entregadorService.create(usuarioId, createEntregadorDto);
+  @Post()
+  async create(@Body() createEntregadorDto: CreateEntregadorDto): Promise<EntregadorResponseDto> {
+    const entregador = await this.entregadorService.create(createEntregadorDto);
     return {
       id: entregador.id,
       nome: entregador.nome,
       telefone: entregador.telefone,
       veiculo: entregador.veiculo,
       placa: entregador.placa,
+      email: entregador.email,
     };
   }
 
@@ -31,6 +29,7 @@ export class EntregadorController {
       telefone: entregador.telefone,
       veiculo: entregador.veiculo,
       placa: entregador.placa,
+      email: entregador.email,
     }));
   }
 
@@ -43,6 +42,7 @@ export class EntregadorController {
       telefone: entregador.telefone,
       veiculo: entregador.veiculo,
       placa: entregador.placa,
+      email: entregador.email,
     };
   }
 
@@ -58,6 +58,7 @@ export class EntregadorController {
       telefone: entregador.telefone,
       veiculo: entregador.veiculo,
       placa: entregador.placa,
+      email: entregador.email,
     };
   }
 
