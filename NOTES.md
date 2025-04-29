@@ -110,7 +110,7 @@ const config = new DocumentBuilder()
 ## 🌐 Endpoint da documentação
 A documentação da API pode ser acessada em:
 ```bash
-➡️ http://localhost:3000/api
+ http://localhost:3000/api
 ```
 ---
 
