@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsuarioModule } from './usuario/usuario.module';
 import { ConsumidorModule } from './consumidor/consumidor.module';
 import { EntregadorModule } from './entregador/entregador.module';
 import { LojaModule } from './loja/loja.module';
@@ -23,7 +22,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       synchronize: true,
     }),
     
-    UsuarioModule, ConsumidorModule, EntregadorModule, LojaModule, CategoriaModule, ProdutoModule, EnderecoModule, EstoqueModule, PedidoModule,  PagamentoModule],
+     ConsumidorModule, EntregadorModule, LojaModule, CategoriaModule, ProdutoModule, EnderecoModule, EstoqueModule, PedidoModule,  PagamentoModule],
     controllers: [AppController],
     providers: [AppService],
 })

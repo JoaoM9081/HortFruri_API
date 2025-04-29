@@ -7,18 +7,17 @@ import { LojaResponseDto } from './dto/LojaResponseDto';
 export class LojaController {
   constructor(private readonly lojaService: LojaService) {}
 
-  @Post('usuario/:usuarioId/endereco/:enderecoId')
+  @Post()
   async create(
-    @Param('usuarioId') usuarioId: number,
-    @Param('enderecoId') enderecoId: number,
     @Body() createLojaDto: CreateLojaDto,
   ): Promise<LojaResponseDto> {
-    const loja = await this.lojaService.create(usuarioId, enderecoId, createLojaDto);
+    const loja = await this.lojaService.create(createLojaDto);
     return {
       id: loja.id,
       nome: loja.nome,
       cnpj: loja.cnpj,
       telefone: loja.telefone,
+      email: loja.email,  // Incluindo email na resposta
     };
   }
 
@@ -30,6 +29,7 @@ export class LojaController {
       nome: loja.nome,
       cnpj: loja.cnpj,
       telefone: loja.telefone,
+      email: loja.email,  // Incluindo email na resposta
     }));
   }
 
@@ -41,6 +41,7 @@ export class LojaController {
       nome: loja.nome,
       cnpj: loja.cnpj,
       telefone: loja.telefone,
+      email: loja.email,  // Incluindo email na resposta
     };
   }
 
@@ -55,22 +56,12 @@ export class LojaController {
       nome: loja.nome,
       cnpj: loja.cnpj,
       telefone: loja.telefone,
+      email: loja.email,  // Incluindo email na resposta
     };
   }
 
   @Delete(':id')
   async remove(@Param('id') id: number): Promise<void> {
     await this.lojaService.remove(id);
-  }
-
-  @Get(':nome')
-  async findByName(@Param('nome') nome: string): Promise<LojaResponseDto> {
-    const loja = await this.lojaService.findByName(nome);
-    return {
-      id: loja.id,
-      nome: loja.nome,
-      cnpj: loja.cnpj,
-      telefone: loja.telefone,
-    };
   }
 }

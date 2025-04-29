@@ -1,16 +1,16 @@
 import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseIntPipe } from '@nestjs/common';
 import { PedidoService } from './pedido.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
-import { FormaPagamento } from 'src/pagamento/dto/create-pagamento.dto';
 import { PedidoResponseDto } from './dto/pedidoResponseDto';
 import { Pedido } from './entities/pedido.entity';
 import { CreateItemPedidoDto } from '../itemPedido/dto/createItemPedidoDto';
+import { FormaPagamentoDto } from 'src/pagamento/dto/formaPagamentoDto';
 
 @Controller('pedidos')
 export class PedidoController {
   constructor(private readonly pedidoService: PedidoService) {}
 
-  @Post(':consumidorId/:lojaId')
+  @Post('consumidor/:consumidorId/loja/:lojaId')
   async create(
     @Param('consumidorId', ParseIntPipe) consumidorId: number,
     @Param('lojaId', ParseIntPipe) lojaId: number,
@@ -20,18 +20,28 @@ export class PedidoController {
     return this.mapToDto(pedido);
   }
 
+  @Post(':pedidoId/itens/:produtoId')
+  async adicionarItem(
+    @Param('pedidoId', ParseIntPipe) pedidoId: number,
+    @Param('produtoId', ParseIntPipe) produtoId: number,
+    @Body() dto: CreateItemPedidoDto,
+  ): Promise<PedidoResponseDto> {
+    const pedido = await this.pedidoService.adicionarItemCarrinho(pedidoId, produtoId, dto);
+    return this.mapToDto(pedido);
+  }
+
   @Get()
   async findAll(): Promise<PedidoResponseDto[]> {
     const pedidos = await this.pedidoService.findAll();
     return pedidos.map(p => this.mapToDto(p));
   }
 
-  @Get(':id')
-  async findOne(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<PedidoResponseDto> {
-    const pedido = await this.pedidoService.findOne(id);
-    return this.mapToDto(pedido);
+  @Get('consumidor/:consumidorId')
+  async findByConsumidor(
+    @Param('consumidorId', ParseIntPipe) consumidorId: number,
+  ): Promise<PedidoResponseDto[]> {
+    const pedidos = await this.pedidoService.findByConsumidor(consumidorId);
+    return pedidos.map(p => this.mapToDto(p));
   }
 
   @Put(':id')
@@ -50,31 +60,12 @@ export class PedidoController {
     await this.pedidoService.remove(id);
   }
 
-  @Post(':pedidoId/itens/:produtoId')
-  async adicionarItem(
-    @Param('pedidoId', ParseIntPipe) pedidoId: number,
-    @Param('produtoId', ParseIntPipe) produtoId: number,
-    @Body() dto: CreateItemPedidoDto,
-  ): Promise<PedidoResponseDto> {
-    const pedido = await this.pedidoService.adicionarItemCarrinho(pedidoId, produtoId, dto);
-    return this.mapToDto(pedido);
-  }
-
   @Delete(':pedidoId/itens/:itemId')
   async removerItem(
     @Param('pedidoId', ParseIntPipe) pedidoId: number,
     @Param('itemId', ParseIntPipe) itemId: number,
   ): Promise<PedidoResponseDto> {
     const pedido = await this.pedidoService.removerItemCarrinho(pedidoId, itemId);
-    return this.mapToDto(pedido);
-  }
-
-  @Post(':pedidoId/finalizar/:forma')
-  async finalizar(
-    @Param('pedidoId', ParseIntPipe) pedidoId: number,
-    @Param('forma') forma: FormaPagamento,
-  ): Promise<PedidoResponseDto> {
-    const pedido = await this.pedidoService.finalizarPedido(pedidoId, forma);
     return this.mapToDto(pedido);
   }
 

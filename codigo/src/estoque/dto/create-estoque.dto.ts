@@ -5,6 +5,9 @@ export class CreateEstoqueDto {
 
   @IsInt()
   @Min(0)
-  @ApiProperty()
+  @ApiProperty({
+    example: 100,  
+    description: 'Quantidade disponível do produto no estoque',
+  })
   quantidadeDisponivel: number;
 }

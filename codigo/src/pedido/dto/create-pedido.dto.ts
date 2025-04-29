@@ -6,7 +6,10 @@ import { CreateItemPedidoDto } from '../../itemPedido/dto/createItemPedidoDto';
 export class CreatePedidoDto {
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateItemPedidoDto)
-  @ApiProperty()
+  @Type(() => CreateItemPedidoDto)  
+  @ApiProperty({
+    type: [CreateItemPedidoDto],  
+    description: 'Lista de itens do pedido',
+  })
   itens: CreateItemPedidoDto[];
 }

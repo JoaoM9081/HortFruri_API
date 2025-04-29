@@ -9,7 +9,6 @@ export enum FormaPagamento {
 export enum StatusPagamento {
   PENDENTE = 'PENDENTE',
   CONCLUIDO = 'CONCLUIDO',
-  FALHOU = 'FALHOU',
 }
 
 export class CreatePagamentoDto {

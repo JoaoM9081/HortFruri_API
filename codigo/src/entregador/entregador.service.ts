@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Entregador } from './entities/entregador.entity';
@@ -11,22 +11,30 @@ export class EntregadorService {
     private readonly repo: Repository<Entregador>,
   ) {}
 
-  async create(usuarioId: number, dto: CreateEntregadorDto): Promise<Entregador> {
-    const entity = this.repo.create({ ...dto, usuario: { id: usuarioId } });
-    return this.repo.save(entity);
+  async create(dto: CreateEntregadorDto): Promise<Entregador> {
+
+    const existingEntregador = await this.repo.findOne({
+      where: { email: dto.email },  
+    });
+
+    if (existingEntregador) {
+      throw new BadRequestException('Este email já está em uso');
+    }
+
+    const entity = this.repo.create(dto);  
+    return this.repo.save(entity);  
   }
 
   findAll(): Promise<Entregador[]> {
-    return this.repo.find({ relations: ['usuario', 'pedidos'] });
+    return this.repo.find();
   }
 
   async findOne(id: number): Promise<Entregador> {
-    const e = await this.repo.findOne({
+    const entregador = await this.repo.findOne({
       where: { id },
-      relations: ['usuario', 'pedidos'],
     });
-    if (!e) throw new NotFoundException(`Entregador ${id} não encontrado`);
-    return e;
+    if (!entregador) throw new NotFoundException(`Entregador ${id} não encontrado`);
+    return entregador;
   }
   
   async update(id: number, dto: Partial<CreateEntregadorDto>): Promise<Entregador> {
