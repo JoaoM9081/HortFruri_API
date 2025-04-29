@@ -1,0 +1,6 @@
+export declare enum StatusPedido {
+    PENDENTE = "PENDENTE",
+    EM_ANDAMENTO = "EM_ANDAMENTO",
+    ABERTO_PARA_PAGAMENTO = "ABERTO_PARA_PAGAMENTO",
+    FINALIZADO = "FINALIZADO"
+}

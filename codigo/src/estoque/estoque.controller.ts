@@ -1,9 +1,11 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete, Put } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseArrayPipe, ParseIntPipe } from '@nestjs/common';
 import { EstoqueService } from './estoque.service';
 import { CreateEstoqueDto } from './dto/create-estoque.dto';
 import { ProdutoService } from '../produto/produto.service';
 import { LojaService } from '../loja/loja.service';
 import { EstoqueResponseDto } from './dto/EstoqueResponseDto';
+import { ProdutoNomeDto } from './dto/ProdutoNomeDto';
+import { EstoqueDecrementarDto } from './dto/EstoqueDecrementarDto';
 
 @Controller('estoques')
 export class EstoqueController {
@@ -13,21 +15,37 @@ export class EstoqueController {
     private readonly lojaService: LojaService,
   ) {}
 
-  @Post(':produtoNome/:lojaNome')	
+  @Post(':produtoId/:lojaId/adicionar')	
   async create(
-    @Param('produtoNome') produtoNome: string,
-    @Param('lojaNome') lojaNome: string,
+    @Param('produtoId', ParseIntPipe) produtoId: number,
+    @Param('lojaId', ParseIntPipe) lojaId: number,
     @Body() createEstoqueDto: CreateEstoqueDto,
   ): Promise<EstoqueResponseDto> {
-    const produto = await this.produtoService.findByName(produtoNome);
-    const loja = await this.lojaService.findByName(lojaNome);
 
-    const estoque = await this.estoqueService.create(produto.id, loja.id, createEstoqueDto);
+    const estoque = await this.estoqueService.create(produtoId, lojaId, createEstoqueDto);
+    const produto = await this.produtoService.findOne(produtoId);  
+    const loja = await this.lojaService.findOne(lojaId); 
     return {
       id: estoque.id,
       quantidadeDisponivel: estoque.quantidadeDisponivel,
       produtoNome: produto.nome,
       lojaNome: loja.nome,
+    };
+  }
+
+  @Post('produto')
+  async getEstoqueByProdutoNome(
+    @Body() { produtoNome }: ProdutoNomeDto, 
+  ): Promise<any> {
+    const produto = await this.produtoService.findByName(produtoNome);
+    const estoque = await this.estoqueService.getEstoqueByProdutoId(produto.id);
+
+    const quantidadeDisponivel = estoque
+      .reduce((total, e) => total + e.quantidadeDisponivel, 0);
+
+    return {
+      produtoNome: produto.nome,
+      quantidadeDisponivel,
     };
   }
 
@@ -72,14 +90,12 @@ export class EstoqueController {
     await this.estoqueService.remove(id);
   }
 
-  @Post(':lojaNome/:produtoNome/decrementar')
+  @Post(':lojaId/:produtoId/decrementar')
   async decrementStock(
-    @Param('lojaNome') lojaNome: string,
-    @Param('produtoNome') produtoNome: string,
-    @Body() dto: { quantidade: number },
+    @Param('lojaId', ParseIntPipe) lojaId: number,
+    @Param('produtoId', ParseIntPipe) produtoId: number,
+    @Body() dto: EstoqueDecrementarDto,
   ): Promise<void> {
-    const produto = await this.produtoService.findByName(produtoNome);
-    const loja = await this.lojaService.findByName(lojaNome);
-    await this.estoqueService.decrementStock(loja.id, produto.id, dto.quantidade);
+    await this.estoqueService.decrementStock(lojaId, produtoId, dto.quantidade);
   }
 }

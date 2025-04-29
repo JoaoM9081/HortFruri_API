@@ -1,15 +1,20 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsInt, Min } from "class-validator";
+import { IsInt, IsString, Min } from "class-validator";
 
 export class CreateItemPedidoDto {
 
     @IsInt()
     @Min(1)
-    @ApiProperty()
+    @ApiProperty({
+      description: 'Quantidade do produto no pedido',
+      example: 2,  
+    })
     quantidade: number;
-  
-    @IsInt()
-    @Min(1)
-    @ApiProperty()
-    produtoId: number;
+
+    @IsString()
+    @ApiProperty({
+      description: 'Nome do produto no pedido',
+      example: 'Banana', 
+    })
+    produtoNome: string;
   }

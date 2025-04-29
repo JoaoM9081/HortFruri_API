@@ -23,7 +23,6 @@ export class PedidoService {
     private readonly pagamentoService: PagamentoService,
   ) {}
 
-  /** Cria pedido + todos os itens de uma vez */
   async create(consumidorId: number, lojaId: number, dto: CreatePedidoDto): Promise<Pedido> {
     const pedido = this.pedidoRepo.create({
       consumidor: { id: consumidorId },
@@ -35,14 +34,14 @@ export class PedidoService {
 
     const itensEntity = await Promise.all(
       dto.itens.map(async itemDto => {
-        const produto = await this.produtoService.findOne(itemDto.produtoId);
+        const produto = await this.produtoService.findByName(itemDto.produtoNome);
         const estoque  = produto.estoques.find(e => e.loja.id === lojaId);
         if (!estoque || itemDto.quantidade > estoque.quantidadeDisponivel) {
           throw new BadRequestException(`Estoque insuficiente para ${produto.nome}`);
         }
         const item = this.itemRepo.create({
           pedido:        { id: salvo.id },
-          produto:       { id: itemDto.produtoId },
+          produto:       { id: produto.id },
           quantidade:     itemDto.quantidade,
           precoUnitario:  produto.preco,
         });

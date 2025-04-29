@@ -64,16 +64,4 @@ export class LojaController {
   async remove(@Param('id') id: number): Promise<void> {
     await this.lojaService.remove(id);
   }
-
-  @Get(':nome')
-  async findByName(@Param('nome') nome: string): Promise<LojaResponseDto> {
-    const loja = await this.lojaService.findByName(nome);
-    return {
-      id: loja.id,
-      nome: loja.nome,
-      cnpj: loja.cnpj,
-      telefone: loja.telefone,
-      email: loja.email,  // Incluindo email na resposta
-    };
-  }
 }

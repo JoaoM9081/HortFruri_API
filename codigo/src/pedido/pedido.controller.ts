@@ -5,18 +5,28 @@ import { FormaPagamento } from 'src/pagamento/dto/create-pagamento.dto';
 import { PedidoResponseDto } from './dto/pedidoResponseDto';
 import { Pedido } from './entities/pedido.entity';
 import { CreateItemPedidoDto } from '../itemPedido/dto/createItemPedidoDto';
+import { FormaPagamentoDto } from 'src/pagamento/dto/formaPagamentoDto';
 
 @Controller('pedidos')
 export class PedidoController {
   constructor(private readonly pedidoService: PedidoService) {}
 
-  @Post(':consumidorId/:lojaId')
+  @Post('consumidor/:consumidorId/loja/:lojaId')
   async create(
     @Param('consumidorId', ParseIntPipe) consumidorId: number,
     @Param('lojaId', ParseIntPipe) lojaId: number,
     @Body() dto: CreatePedidoDto,
   ): Promise<PedidoResponseDto> {
     const pedido = await this.pedidoService.create(consumidorId, lojaId, dto);
+    return this.mapToDto(pedido);
+  }
+
+  @Post(':pedidoId/Pagar')
+  async finalizar(
+    @Param('pedidoId', ParseIntPipe) pedidoId: number,
+    @Body() pagamentoDto: FormaPagamentoDto,
+  ): Promise<PedidoResponseDto> {
+    const pedido = await this.pedidoService.finalizarPedido(pedidoId, pagamentoDto.formaPagamento);
     return this.mapToDto(pedido);
   }
 
@@ -66,15 +76,6 @@ export class PedidoController {
     @Param('itemId', ParseIntPipe) itemId: number,
   ): Promise<PedidoResponseDto> {
     const pedido = await this.pedidoService.removerItemCarrinho(pedidoId, itemId);
-    return this.mapToDto(pedido);
-  }
-
-  @Post(':pedidoId/finalizar/:forma')
-  async finalizar(
-    @Param('pedidoId', ParseIntPipe) pedidoId: number,
-    @Param('forma') forma: FormaPagamento,
-  ): Promise<PedidoResponseDto> {
-    const pedido = await this.pedidoService.finalizarPedido(pedidoId, forma);
     return this.mapToDto(pedido);
   }
 

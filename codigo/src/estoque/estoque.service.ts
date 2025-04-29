@@ -69,4 +69,16 @@ export class EstoqueService {
 
     await this.repo.save(estoque);
   }
+
+  async getEstoqueByProdutoId(produtoId: number): Promise<Estoque[]> {
+    const estoque = await this.repo.find({
+      where: { produto: { id: produtoId } },
+    });
+
+    if (!estoque || estoque.length === 0) {
+      throw new NotFoundException(`Estoque não encontrado para o produto com ID ${produtoId}`);
+    }
+
+    return estoque;
+  }
 }

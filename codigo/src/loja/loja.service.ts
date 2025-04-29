@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Loja } from './entities/loja.entity';
 import { CreateLojaDto } from './dto/create-loja.dto';
 
@@ -59,8 +59,17 @@ export class LojaService {
   }
 
   async findByName(nome: string): Promise<Loja> {
-    const loja = await this.repo.findOne({ where: { nome } });
-    if (!loja) throw new NotFoundException(`Loja com nome ${nome} não encontrada`);
+   
+    const loja = await this.repo.findOne({
+      where: {
+        nome: Like(`%${nome.toLowerCase()}%`),  
+      },
+    });
+
+    if (!loja) {
+      throw new NotFoundException(`Loja com nome ${nome} não encontrada`);
+    }
+
     return loja;
   }
 }
