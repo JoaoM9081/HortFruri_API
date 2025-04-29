@@ -14,9 +14,11 @@ Utiliza **TypeORM** com banco de dados **SQLite**, seguindo boas práticas REST,
 
 ---
 
-## ⚙️ Criando o projeto
+## ⚙️ Executando Projeto 
 
 ```bash
+git clone https://github.com/JoaoM9081/HortFruri_API
+cd codigo 
 npm i -g @nestjs/cli
 npm install
 npm run start:dev
