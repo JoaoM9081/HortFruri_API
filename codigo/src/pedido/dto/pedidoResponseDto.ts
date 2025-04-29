@@ -1,4 +1,4 @@
-import { ItemPedidoResponseDto } from "./itemPedidoResponseDto";
+import { ItemPedidoResponseDto } from "../../itemPedido/dto/itemPedidoResponseDto";
 import { StatusPedido } from "./StatusPedido";
 
 export class PedidoResponseDto {

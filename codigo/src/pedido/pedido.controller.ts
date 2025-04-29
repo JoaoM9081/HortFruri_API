@@ -4,7 +4,7 @@ import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { FormaPagamento } from 'src/pagamento/dto/create-pagamento.dto';
 import { PedidoResponseDto } from './dto/pedidoResponseDto';
 import { Pedido } from './entities/pedido.entity';
-import { CreateItemPedidoDto } from './dto/createItemPedidoDto';
+import { CreateItemPedidoDto } from '../itemPedido/dto/createItemPedidoDto';
 
 @Controller('pedidos')
 export class PedidoController {
@@ -69,23 +69,15 @@ export class PedidoController {
     return this.mapToDto(pedido);
   }
 
-  @Post(':pedidoId/checkout/:forma')
-  async iniciarCheckout(
+  @Post(':pedidoId/finalizar/:forma')
+  async finalizar(
     @Param('pedidoId', ParseIntPipe) pedidoId: number,
     @Param('forma') forma: FormaPagamento,
-  ) {
-    return this.pedidoService.iniciarCheckout(pedidoId, forma);
-  }
-
-  @Post(':pedidoId/confirmar-pagamento/:pagamentoId')
-  async confirmarPagamento(
-    @Param('pagamentoId', ParseIntPipe) pagamentoId: number,
-  ) {
-    const pedido = await this.pedidoService.confirmarPagamento(pagamentoId);
+  ): Promise<PedidoResponseDto> {
+    const pedido = await this.pedidoService.finalizarPedido(pedidoId, forma);
     return this.mapToDto(pedido);
   }
 
-  /** Mapeia entidade Pedido para DTO de resposta */
   private mapToDto(p: Pedido): PedidoResponseDto {
     return {
       id: p.id,

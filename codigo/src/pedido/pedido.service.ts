@@ -9,7 +9,7 @@ import { PagamentoService } from 'src/pagamento/pagamento.service';
 import { FormaPagamento, StatusPagamento } from 'src/pagamento/dto/create-pagamento.dto';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { StatusPedido } from './dto/StatusPedido';
-import { CreateItemPedidoDto } from './dto/createItemPedidoDto';
+import { CreateItemPedidoDto } from '../itemPedido/dto/createItemPedidoDto';
 
 @Injectable()
 export class PedidoService {
@@ -141,38 +141,45 @@ export class PedidoService {
     return this.pedidoRepo.save(pedido);
   }
 
-  /** Cria um pagamento e abre o pedido para pagamento */
-  async iniciarCheckout(pedidoId: number, forma: FormaPagamento) {
-    const pedido = await this.recalcularTotal(pedidoId);
-    if (pedido.itens.length === 0) {
-      throw new BadRequestException('Carrinho vazio');
-    }
-    const existePendente = pedido.pagamentos.some(p => p.status === StatusPagamento.PENDENTE);
-    if (existePendente) {
-      throw new BadRequestException('Já existe pagamento pendente');
-    }
-    const pagamento = await this.pagamentoService.create(pedidoId, {
-      formaPagamento: forma,
-      valorPago:      pedido.total,
-    });
-    pedido.status = StatusPedido.ABERTO_PARA_PAGAMENTO;
-    await this.pedidoRepo.save(pedido);
-    return pagamento;
-  }
+  async finalizarPedido(
+    pedidoId: number,
+    forma: FormaPagamento,
+  ): Promise<Pedido> {
+    const pedido = await this.findOne(pedidoId);
 
-  /** Confirma um pagamento, debita estoque e finaliza o pedido */
-  async confirmarPagamento(pagamentoId: number) {
-    const pagamento = await this.pagamentoService.findOne(pagamentoId);
-    if (pagamento.status !== StatusPagamento.CONCLUIDO) {
-      throw new BadRequestException('Pagamento não concluído');
+    if (pedido.status !== StatusPedido.PENDENTE) {
+      throw new BadRequestException(
+        'Somente pedidos com status PENDENTE podem ser finalizados',
+      );
     }
-    const pedido = await this.findOne(pagamento.pedido.id);
-    if (pedido.status !== StatusPedido.ABERTO_PARA_PAGAMENTO) {
-      throw new BadRequestException('Pedido não está em aberto para pagamento');
+
+    pedido.total = pedido.itens.reduce(
+      (soma, item) => soma + item.precoUnitario * item.quantidade,
+      0,
+    );
+    await this.pedidoRepo.save(pedido);
+
+    if (pedido.itens.length === 0) {
+      throw new BadRequestException('Não é possível finalizar pedido sem itens');
     }
+
+    const pendente = pedido.pagamentos?.some(p => p.status === StatusPagamento.PENDENTE);
+    if (pendente) {
+      throw new BadRequestException('Já existe um pagamento pendente para este pedido');
+    }
+
+    const pagamento = await this.pagamentoService.createPagamento(pedidoId, forma);
+
+    await this.pagamentoService.updateStatus(pagamento.id, StatusPagamento.CONCLUIDO);
+
     for (const item of pedido.itens) {
-      await this.estoqueService.decrementStock(pedido.loja.id, item.produto.id, item.quantidade);
+      await this.estoqueService.decrementStock(
+        pedido.loja.id,
+        item.produto.id,
+        item.quantidade,
+      );
     }
+    
     pedido.status = StatusPedido.FINALIZADO;
     return this.pedidoRepo.save(pedido);
   }

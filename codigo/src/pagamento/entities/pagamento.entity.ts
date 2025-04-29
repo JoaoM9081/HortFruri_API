@@ -7,7 +7,7 @@ export class Pagamento {
     @PrimaryGeneratedColumn()
     id: number;
   
-    @ManyToOne(() => Pedido, pedido => pedido.pagamentos, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Pedido, pedido => pedido.pagamentos, { onDelete: 'CASCADE' , eager: true })
     @JoinColumn({ name: 'pedidoId' })
     pedido: Pedido;
   

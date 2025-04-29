@@ -1,4 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNumber, Min } from 'class-validator';
 
 export enum FormaPagamento {
@@ -14,12 +13,13 @@ export enum StatusPagamento {
 }
 
 export class CreatePagamentoDto {
-
   @IsEnum(FormaPagamento)
-  @ApiProperty()
   formaPagamento: FormaPagamento;
 
   @IsNumber()
   @Min(0)
   valorPago: number;
+
+  @IsEnum(StatusPagamento)
+  status: StatusPagamento;
 }
