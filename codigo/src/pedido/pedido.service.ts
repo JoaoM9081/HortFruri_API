@@ -6,7 +6,6 @@ import { ItemPedido } from 'src/itemPedido/entities/itemPedido.entity';
 import { ProdutoService } from 'src/produto/produto.service';
 import { EstoqueService } from 'src/estoque/estoque.service';
 import { PagamentoService } from 'src/pagamento/pagamento.service';
-import { FormaPagamento, StatusPagamento } from 'src/pagamento/dto/create-pagamento.dto';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { StatusPedido } from './dto/StatusPedido';
 import { CreateItemPedidoDto } from '../itemPedido/dto/createItemPedidoDto';
@@ -19,8 +18,6 @@ export class PedidoService {
     @InjectRepository(ItemPedido)
     private readonly itemRepo: Repository<ItemPedido>,
     private readonly produtoService: ProdutoService,
-    private readonly estoqueService: EstoqueService,
-    private readonly pagamentoService: PagamentoService,
   ) {}
 
   async create(consumidorId: number, lojaId: number, dto: CreatePedidoDto): Promise<Pedido> {
@@ -54,7 +51,6 @@ export class PedidoService {
     return this.pedidoRepo.save(salvo);
   }
 
-  /** Lista todos os pedidos */
   findAll(): Promise<Pedido[]> {
     return this.pedidoRepo.find({
       relations: [
@@ -64,7 +60,6 @@ export class PedidoService {
     });
   }
 
-  /** Busca um pedido por ID */
   async findOne(id: number): Promise<Pedido> {
     const pedido = await this.pedidoRepo.findOne({
       where: { id },
@@ -77,18 +72,15 @@ export class PedidoService {
     return pedido;
   }
 
-  /** Atualiza apenas campos de cabeçalho do pedido */
   async update(id: number, dto: Partial<CreatePedidoDto>): Promise<Pedido> {
     await this.pedidoRepo.update(id, dto);
     return this.findOne(id);
   }
 
-  /** Remove um pedido inteiro */
   async remove(id: number): Promise<void> {
     await this.pedidoRepo.delete(id);
   }
 
-  /** Adiciona ou atualiza um item em um pedido PENDENTE */
   async adicionarItemCarrinho(
     pedidoId: number,
     produtoId: number,
@@ -121,7 +113,6 @@ export class PedidoService {
     return this.recalcularTotal(pedidoId);
   }
 
-  /** Remove um item de um pedido PENDENTE */
   async removerItemCarrinho(pedidoId: number, itemId: number): Promise<Pedido> {
     const item = await this.itemRepo.findOne({
       where: { id: itemId, pedido: { id: pedidoId } }
@@ -140,46 +131,18 @@ export class PedidoService {
     return this.pedidoRepo.save(pedido);
   }
 
-  async finalizarPedido(
-    pedidoId: number,
-    forma: FormaPagamento,
-  ): Promise<Pedido> {
-    const pedido = await this.findOne(pedidoId);
-
-    if (pedido.status !== StatusPedido.PENDENTE) {
-      throw new BadRequestException(
-        'Somente pedidos com status PENDENTE podem ser finalizados',
-      );
-    }
-
-    pedido.total = pedido.itens.reduce(
-      (soma, item) => soma + item.precoUnitario * item.quantidade,
-      0,
-    );
-    await this.pedidoRepo.save(pedido);
-
-    if (pedido.itens.length === 0) {
-      throw new BadRequestException('Não é possível finalizar pedido sem itens');
-    }
-
-    const pendente = pedido.pagamentos?.some(p => p.status === StatusPagamento.PENDENTE);
-    if (pendente) {
-      throw new BadRequestException('Já existe um pagamento pendente para este pedido');
-    }
-
-    const pagamento = await this.pagamentoService.createPagamento(pedidoId, forma);
-
-    await this.pagamentoService.updateStatus(pagamento.id, StatusPagamento.CONCLUIDO);
-
-    for (const item of pedido.itens) {
-      await this.estoqueService.decrementStock(
-        pedido.loja.id,
-        item.produto.id,
-        item.quantidade,
-      );
-    }
-    
-    pedido.status = StatusPedido.FINALIZADO;
-    return this.pedidoRepo.save(pedido);
+  async findByConsumidor(consumidorId: number): Promise<Pedido[]> {
+    return this.pedidoRepo.find({
+      where: { consumidor: { id: consumidorId } },
+      relations: [
+        'consumidor',
+        'loja',
+        'entregador',
+        'itens',
+        'itens.produto',
+        'pagamentos',
+      ],
+      order: { dataCriacao: 'DESC' }, 
+    });
   }
 }

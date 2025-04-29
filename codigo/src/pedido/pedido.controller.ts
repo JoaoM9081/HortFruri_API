@@ -1,7 +1,6 @@
 import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseIntPipe } from '@nestjs/common';
 import { PedidoService } from './pedido.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
-import { FormaPagamento } from 'src/pagamento/dto/create-pagamento.dto';
 import { PedidoResponseDto } from './dto/pedidoResponseDto';
 import { Pedido } from './entities/pedido.entity';
 import { CreateItemPedidoDto } from '../itemPedido/dto/createItemPedidoDto';
@@ -21,12 +20,13 @@ export class PedidoController {
     return this.mapToDto(pedido);
   }
 
-  @Post(':pedidoId/Pagar')
-  async finalizar(
+  @Post(':pedidoId/itens/:produtoId')
+  async adicionarItem(
     @Param('pedidoId', ParseIntPipe) pedidoId: number,
-    @Body() pagamentoDto: FormaPagamentoDto,
+    @Param('produtoId', ParseIntPipe) produtoId: number,
+    @Body() dto: CreateItemPedidoDto,
   ): Promise<PedidoResponseDto> {
-    const pedido = await this.pedidoService.finalizarPedido(pedidoId, pagamentoDto.formaPagamento);
+    const pedido = await this.pedidoService.adicionarItemCarrinho(pedidoId, produtoId, dto);
     return this.mapToDto(pedido);
   }
 
@@ -36,12 +36,12 @@ export class PedidoController {
     return pedidos.map(p => this.mapToDto(p));
   }
 
-  @Get(':id')
-  async findOne(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<PedidoResponseDto> {
-    const pedido = await this.pedidoService.findOne(id);
-    return this.mapToDto(pedido);
+  @Get('consumidor/:consumidorId')
+  async findByConsumidor(
+    @Param('consumidorId', ParseIntPipe) consumidorId: number,
+  ): Promise<PedidoResponseDto[]> {
+    const pedidos = await this.pedidoService.findByConsumidor(consumidorId);
+    return pedidos.map(p => this.mapToDto(p));
   }
 
   @Put(':id')
@@ -58,16 +58,6 @@ export class PedidoController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
     await this.pedidoService.remove(id);
-  }
-
-  @Post(':pedidoId/itens/:produtoId')
-  async adicionarItem(
-    @Param('pedidoId', ParseIntPipe) pedidoId: number,
-    @Param('produtoId', ParseIntPipe) produtoId: number,
-    @Body() dto: CreateItemPedidoDto,
-  ): Promise<PedidoResponseDto> {
-    const pedido = await this.pedidoService.adicionarItemCarrinho(pedidoId, produtoId, dto);
-    return this.mapToDto(pedido);
   }
 
   @Delete(':pedidoId/itens/:itemId')
