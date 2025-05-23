@@ -11,6 +11,7 @@ import { EstoqueModule } from './estoque/estoque.module';
 import { PedidoModule } from './pedido/pedido.module';
 import { PagamentoModule } from './pagamento/pagamento.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AvaliacaoModule } from './avaliacao/avaliacao.module';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       synchronize: true,
     }),
     
-     ConsumidorModule, EntregadorModule, LojaModule, CategoriaModule, ProdutoModule, EnderecoModule, EstoqueModule, PedidoModule,  PagamentoModule],
+     ConsumidorModule, EntregadorModule, LojaModule, CategoriaModule, ProdutoModule, EnderecoModule, EstoqueModule, PedidoModule,  PagamentoModule, AvaliacaoModule],
     controllers: [AppController],
     providers: [AppService],
 })

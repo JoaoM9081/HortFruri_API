@@ -6,7 +6,6 @@ import { Pedido } from 'src/pedido/entities/pedido.entity';
 import { FormaPagamento, StatusPagamento } from './dto/create-pagamento.dto';
 import { StatusPedido } from 'src/pedido/dto/StatusPedido';
 import { EstoqueService } from 'src/estoque/estoque.service';
-import { PagamentoResponseDto } from './dto/PagamentoResponseDto';
 
 @Injectable()
 export class PagamentoService {

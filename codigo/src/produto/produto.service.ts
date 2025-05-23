@@ -3,12 +3,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { Produto } from './entities/produto.entity';
 import { CreateProdutoDto } from './dto/create-produto.dto';
+import { Loja } from 'src/loja/entities/loja.entity';
+import { Categoria } from 'src/categoria/entities/categoria.entity';
 
 @Injectable()
 export class ProdutoService {
   constructor(
     @InjectRepository(Produto)
     private readonly repo: Repository<Produto>,
+     @InjectRepository(Loja)
+        private readonly lojaRepo: Repository<Loja>,
+         @InjectRepository(Categoria)
+    private readonly categoriaRepo: Repository<Categoria>,
   ) {}
 
   async create(
@@ -16,6 +22,17 @@ export class ProdutoService {
     categoriaId: number,
     dto: CreateProdutoDto,
   ): Promise<Produto> {
+
+     const loja = await this.lojaRepo.findOne({ where: { id: lojaId } });
+    if (!loja) {
+      throw new NotFoundException(`Loja ${lojaId} não encontrada`);
+    }
+
+     const categoria = await this.categoriaRepo.findOne({ where: { id: categoriaId } });
+    if (!categoria) {
+      throw new NotFoundException(`Categoria ${categoriaId} não encontrada`);
+    }
+
     const produto = this.repo.create({
       ...dto,
       loja:      { id: lojaId },

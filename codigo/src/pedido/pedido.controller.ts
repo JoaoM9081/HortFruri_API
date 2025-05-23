@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
 import { PedidoService } from './pedido.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { PedidoResponseDto } from './dto/pedidoResponseDto';
@@ -44,6 +44,18 @@ export class PedidoController {
     return pedidos.map(p => this.mapToDto(p));
   }
 
+  @Patch(':pedidoId/entregador/:entregadorId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async atribuirEntregador(
+    @Param('pedidoId', ParseIntPipe)           pedidoId: number,
+    @Param('entregadorId', ParseIntPipe) entregadorId: number,
+  ): Promise<void> {
+    await this.pedidoService.atribuirEntregador(
+      pedidoId,
+      entregadorId
+    );
+  }
+
   @Put(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -75,12 +87,23 @@ export class PedidoController {
       status: p.status,
       total: p.total,
       dataCriacao: p.dataCriacao,
+      endereco: {
+      id:         p.endereco.id,
+      rua:        p.endereco.rua,
+      numero:     p.endereco.numero,
+      complemento:p.endereco.complemento,
+      cidade:     p.endereco.cidade,
+      cep:        p.endereco.cep,
+    },
+
       itens: p.itens.map(item => ({
         id: item.id,
         nomeProduto: item.produto.nome,
         quantidade: item.quantidade,
         precoUnitario: item.precoUnitario,
       })),
+
+      entregadorId: p.entregador?.id,
     };
   }
 }

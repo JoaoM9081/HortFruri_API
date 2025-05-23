@@ -33,22 +33,6 @@ export class EstoqueController {
     };
   }
 
-  @Post('produto')
-  async getEstoqueByProdutoNome(
-    @Body() { produtoNome }: ProdutoNomeDto, 
-  ): Promise<any> {
-    const produto = await this.produtoService.findByName(produtoNome);
-    const estoque = await this.estoqueService.getEstoqueByProdutoId(produto.id);
-
-    const quantidadeDisponivel = estoque
-      .reduce((total, e) => total + e.quantidadeDisponivel, 0);
-
-    return {
-      produtoNome: produto.nome,
-      quantidadeDisponivel,
-    };
-  }
-
   @Get()
   async findAll(): Promise<EstoqueResponseDto[]> {
     const estoques = await this.estoqueService.findAll();

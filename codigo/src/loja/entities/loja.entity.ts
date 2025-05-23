@@ -36,4 +36,4 @@ export class Loja {
   
     @OneToMany(() => Pedido, pedido => pedido.loja, { onDelete: 'CASCADE' })
     pedidos: Pedido[];
-  }
+  } 

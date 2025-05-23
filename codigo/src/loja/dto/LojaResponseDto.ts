@@ -4,5 +4,13 @@ export class LojaResponseDto {
     cnpj: string;
     telefone: string;
     email: string;
+    endereco: {
+        id: number;
+        rua: string;
+        numero: string;
+        complemento?: string;
+        cidade: string;
+        cep: string;
+    };
   }
   

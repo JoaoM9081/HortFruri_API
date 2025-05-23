@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pedido } from './entities/pedido.entity';
@@ -9,6 +9,11 @@ import { PagamentoService } from 'src/pagamento/pagamento.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { StatusPedido } from './dto/StatusPedido';
 import { CreateItemPedidoDto } from '../itemPedido/dto/createItemPedidoDto';
+import { Endereco } from 'src/endereco/entities/endereco.entity';
+import { Consumidor } from 'src/consumidor/entities/consumidor.entity';
+import { Loja } from 'src/loja/entities/loja.entity';
+import { Entregador } from 'src/entregador/entities/entregador.entity';
+import { StatusPagamento } from 'src/pagamento/dto/create-pagamento.dto';
 
 @Injectable()
 export class PedidoService {
@@ -18,12 +23,46 @@ export class PedidoService {
     @InjectRepository(ItemPedido)
     private readonly itemRepo: Repository<ItemPedido>,
     private readonly produtoService: ProdutoService,
+    
+    @InjectRepository(Endereco)     
+    private readonly enderecoRepo: Repository<Endereco>,
+
+    @InjectRepository(Consumidor)
+    private readonly consumidorRepo: Repository<Consumidor>,
+
+    @InjectRepository(Loja)
+    private readonly lojaRepo: Repository<Loja>,
+
+    @InjectRepository(Entregador)
+    private readonly entregadorRepo: Repository<Entregador>,
   ) {}
 
   async create(consumidorId: number, lojaId: number, dto: CreatePedidoDto): Promise<Pedido> {
+
+    const consumidor = await this.consumidorRepo.findOne({ where: { id: consumidorId } });
+    if (!consumidor) {
+      throw new NotFoundException(`Consumidor ${consumidorId} não encontrado`);
+    }
+
+    // 2) valida loja
+    const loja = await this.lojaRepo.findOne({ where: { id: lojaId } });
+    if (!loja) {
+      throw new NotFoundException(`Loja ${lojaId} não encontrada`);
+    }
+
+    const endereco = await this.enderecoRepo.findOne({
+    where: { id: dto.enderecoId },
+    });
+    if (!endereco) {
+      throw new BadRequestException(
+        `Endereço ${dto.enderecoId} não existe`
+      );
+    }
+
     const pedido = this.pedidoRepo.create({
       consumidor: { id: consumidorId },
       loja:        { id: lojaId },
+      endereco:   endereco,
       status:      StatusPedido.PENDENTE,
       total:       0,
     });
@@ -144,5 +183,44 @@ export class PedidoService {
       ],
       order: { dataCriacao: 'DESC' }, 
     });
+  }
+
+  async atribuirEntregador(
+  pedidoId: number,
+  entregadorId: number,
+): Promise<Pedido> {
+    // 1) carrega o pedido com entregador (e se quiser, itens/pagamentos)
+    const pedido = await this.pedidoRepo.findOne({
+      where: { id: pedidoId },
+      relations: ['entregador'],
+    });
+    if (!pedido) {
+      throw new NotFoundException(`Pedido ${pedidoId} não encontrado`);
+    }
+
+    // 2) só pedidos FINALIZADO podem receber entregador
+    if (pedido.status !== StatusPedido.FINALIZADO) {
+      throw new BadRequestException(
+        'Só é possível atribuir entregador a pedidos finalizados',
+      );
+    }
+
+    if (pedido.entregador) {
+    throw new ConflictException(
+      `Pedido ${pedidoId} já possui entregador atribuído`,
+    );
+  }
+
+    // 3) carrega o entregador
+    const entregador = await this.entregadorRepo.findOne({
+      where: { id: entregadorId },
+    });
+    if (!entregador) {
+      throw new NotFoundException(`Entregador ${entregadorId} não encontrado`);
+    }
+
+    // 4) vincula e salva
+    pedido.entregador = entregador;
+    return this.pedidoRepo.save(pedido);
   }
 }

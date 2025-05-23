@@ -25,6 +25,14 @@ import { PagamentoResponseDto } from './dto/PagamentoResponseDto';
         status: pedido.status,
         total: pedido.total,
         dataCriacao: pedido.dataCriacao,
+        endereco: {
+        id:         pedido.endereco.id,
+        rua:        pedido.endereco.rua,
+        numero:     pedido.endereco.numero,
+        complemento:pedido.endereco.complemento,
+        cidade:     pedido.endereco.cidade,
+        cep:        pedido.endereco.cep,
+      },
         itens: pedido.itens.map(item => ({
           id: item.id,
           nomeProduto: item.produto.nome,    

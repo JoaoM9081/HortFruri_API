@@ -5,6 +5,8 @@ import { Loja } from 'src/loja/entities/loja.entity';
 import { Pagamento } from 'src/pagamento/entities/pagamento.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn } from 'typeorm';
 import { StatusPedido } from '../dto/StatusPedido';
+import { Endereco } from 'src/endereco/entities/endereco.entity';
+import { Avaliacao } from 'src/avaliacao/entities/avaliacao.entity';
 
 @Entity()
 export class Pedido {
@@ -34,7 +36,14 @@ export class Pedido {
   
     @Column('decimal', { precision: 10, scale: 2 })
     total: number;
-  
+
+    @ManyToOne(() => Endereco, { eager: true, onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'enderecoId' })
+    endereco: Endereco;
+
     @CreateDateColumn()
     dataCriacao: Date;
+
+    @OneToMany(() => Avaliacao, a => a.pedido)
+    avaliacoes: Avaliacao[];
   }
