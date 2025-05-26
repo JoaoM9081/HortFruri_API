@@ -1,7 +1,10 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ConsumidorService } from './consumidor.service';
 import { CreateConsumidorDto } from './dto/create-consumidor.dto';
 import { ConsumidorResponseDto } from './dto/consumidorResponseDto';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
+import { Roles } from 'src/auth/roles/roles.decorator';
 
 @Controller('consumidores')
 export class ConsumidorController {
@@ -15,6 +18,8 @@ export class ConsumidorController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   async findAll(): Promise<ConsumidorResponseDto[]> {
     const consumidores = await this.consumidorService.findAll();
     return consumidores.map(consumidor => ({
@@ -26,6 +31,8 @@ export class ConsumidorController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   async findOne(@Param('id') id: number): Promise<ConsumidorResponseDto> {
     const consumidor = await this.consumidorService.findOne(id);
     return {
@@ -37,6 +44,8 @@ export class ConsumidorController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   async update(@Param('id') id: number, @Body() dto: CreateConsumidorDto): Promise<ConsumidorResponseDto> {
     const consumidor = await this.consumidorService.update(id, dto);
     return {
@@ -48,6 +57,8 @@ export class ConsumidorController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   async remove(@Param('id') id: number): Promise<void> {
     await this.consumidorService.remove(id);
   }

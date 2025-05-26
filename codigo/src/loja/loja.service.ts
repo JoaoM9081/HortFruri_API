@@ -4,6 +4,8 @@ import { Like, Repository } from 'typeorm';
 import { Loja } from './entities/loja.entity';
 import { CreateLojaDto } from './dto/create-loja.dto';
 import { Endereco } from 'src/endereco/entities/endereco.entity';
+import { UsuarioService } from 'src/usuario/usuario.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class LojaService {
@@ -12,44 +14,45 @@ export class LojaService {
     private readonly repo: Repository<Loja>,
     @InjectRepository(Endereco)
     private readonly enderecoRepo: Repository<Endereco>,
+
+    private readonly usuarioService: UsuarioService, // Supondo que você tenha um serviço de usuário
   ) {}
 
   async create(dto: CreateLojaDto): Promise<Loja> {
-    // Verificar se o CNPJ já existe
-    const existingLojaByCnpj = await this.repo.findOne({
-      where: { cnpj: dto.cnpj },
-    });
-
-    if (existingLojaByCnpj) {
+    // 1) Verificar CNPJ único
+    if (await this.repo.findOne({ where: { cnpj: dto.cnpj } })) {
       throw new BadRequestException('Este CNPJ já está em uso');
     }
 
-    // Verificar se o email já existe
-    const existingLojaByEmail = await this.repo.findOne({
-      where: { email: dto.email },
-    });
-
-    if (existingLojaByEmail) {
+    // 2) Verificar e-mail único
+    if (await this.repo.findOne({ where: { email: dto.email } })) {
       throw new BadRequestException('Este email já está em uso');
     }
 
+    // 3) Validar endereço
     const endereco = await this.enderecoRepo.findOne({
-    where: { id: dto.enderecoId },
+      where: { id: dto.enderecoId },
     });
     if (!endereco) {
       throw new BadRequestException(`Endereço ${dto.enderecoId} não existe`);
     }
 
-    // Criar e salvar a loja se CNPJ e email forem únicos
-    const loja = this.repo.create({
-    nome:      dto.nome,
-    cnpj:      dto.cnpj,
-    telefone:  dto.telefone,
-    email:     dto.email,
-    senha:     dto.senha,
-    endereco,              // <— aqui a relação
-  });
-    return this.repo.save(loja);
+    // 4) Criar e salvar a Loja
+    const lojaEntity = this.repo.create({
+      nome:     dto.nome,
+      cnpj:     dto.cnpj,
+      telefone: dto.telefone,
+      email:    dto.email,
+      senha:    dto.senha,
+      endereco,
+    });
+    const loja = await this.repo.save(lojaEntity);
+
+    // 5) Gerar hash da senha e criar usuário com role = 'loja'
+    const hash = await bcrypt.hash(dto.senha, 10);
+    await this.usuarioService.create(loja.email, hash, 'loja');
+
+    return loja;
   }
 
   findAll(): Promise<Loja[]> {

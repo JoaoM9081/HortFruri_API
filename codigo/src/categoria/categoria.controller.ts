@@ -1,10 +1,15 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete, Put } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, Put, UseGuards } from '@nestjs/common';
 import { CategoriaService } from './categoria.service';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { CategoriaResponseDto } from './dto/categoria-response.dto';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
+import { Roles } from 'src/auth/roles/roles.decorator';
 
 
 @Controller('categorias')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('loja')
 export class CategoriaController {
   constructor(private readonly categoriaService: CategoriaService) {}
 

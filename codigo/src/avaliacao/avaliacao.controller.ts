@@ -8,17 +8,23 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { AvaliacaoService }     from './avaliacao.service';
 import { CreateAvaliacaoDto }   from './dto/create-avaliacao.dto';
 import { AvaliacaoResponseDto } from './dto/AvaliacaoResponseDto';
 import { Avaliacao } from './entities/avaliacao.entity';
+import { Roles } from 'src/auth/roles/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
 
 @Controller('pedidos/:pedidoId/avaliacoes')
 export class AvaliacaoController {
   constructor(private readonly service: AvaliacaoService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('consumidor')
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Param('pedidoId', ParseIntPipe) pedidoId: number,
@@ -34,6 +40,8 @@ export class AvaliacaoController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('consumidor')
   async findByPedido(
     @Param('pedidoId', ParseIntPipe) pedidoId: number,
   ): Promise<AvaliacaoResponseDto[]> {

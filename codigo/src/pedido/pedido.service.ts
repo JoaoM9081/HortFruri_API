@@ -223,4 +223,25 @@ export class PedidoService {
     pedido.entregador = entregador;
     return this.pedidoRepo.save(pedido);
   }
+
+  async findByEntregador(entregadorId: number): Promise<Pedido[]> {
+
+    const entregador = await this.entregadorRepo.findOne({
+      where: { id: entregadorId },
+    });
+    if (!entregador) {
+      throw new NotFoundException(`Entregador ${entregadorId} não encontrado`);
+    }
+    
+    return this.pedidoRepo.find({
+      where: { entregador: { id: entregadorId } },
+      relations: [
+        'loja',           // para acessar loja.endereco
+        'loja.endereco',
+        'endereco',       // pedido.endereco = entrega
+      ],
+      order: { dataCriacao: 'ASC' },
+    });
+  }
+
 }

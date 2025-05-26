@@ -4,10 +4,12 @@ import { LojaController } from './loja.controller';
 import { Loja } from './entities/loja.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Endereco } from 'src/endereco/entities/endereco.entity';
+import { UsuarioModule } from 'src/usuario/usuario.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Loja, Endereco]), 
+    UsuarioModule,
   ],
   providers: [LojaService],
   controllers: [LojaController],
