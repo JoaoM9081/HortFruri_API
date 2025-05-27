@@ -1,8 +1,11 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { LojaService } from './loja.service';
 import { CreateLojaDto } from './dto/create-loja.dto';
 import { LojaResponseDto } from './dto/LojaResponseDto';
 import { UpdateLojaDto } from './dto/update-loja.dto';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
+import { Roles } from 'src/auth/roles/roles.decorator';
 
 @Controller('lojas')
 export class LojaController {
@@ -17,12 +20,16 @@ export class LojaController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   async findAll(): Promise<LojaResponseDto[]> {
     const lojas = await this.lojaService.findAll();
     return lojas.map(l => this.toResponse(l));
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'loja')	
   async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<LojaResponseDto> {
@@ -31,6 +38,8 @@ export class LojaController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'loja')	
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: CreateLojaDto,
@@ -39,7 +48,9 @@ export class LojaController {
     return this.toResponse(loja);
   }
 
-   @Delete(':id')
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'loja')	
   async remove(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {

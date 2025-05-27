@@ -24,7 +24,7 @@ export class AvaliacaoController {
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('consumidor')
+  @Roles('consumidor', 'admin')
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Param('pedidoId', ParseIntPipe) pedidoId: number,
@@ -41,7 +41,7 @@ export class AvaliacaoController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('consumidor')
+  @Roles('consumidor', 'admin')
   async findByPedido(
     @Param('pedidoId', ParseIntPipe) pedidoId: number,
   ): Promise<AvaliacaoResponseDto[]> {

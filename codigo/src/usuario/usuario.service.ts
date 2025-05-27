@@ -28,8 +28,12 @@ export class UsuarioService {
 
   async createAdmin(email: string, plain: string, role: Usuario['role'] = 'admin') {
     if (await this.repo.findOne({ where: { email } }))
-      throw new BadRequestException('CPF já cadastrado');
+      throw new BadRequestException('E-mail já cadastrado');
     const password = await bcrypt.hash(plain, 10);
     return this.repo.save(this.repo.create({ email, password, role }));
+  }
+
+  findAll(): Promise<Usuario[]> {
+    return this.repo.find();
   }
 }

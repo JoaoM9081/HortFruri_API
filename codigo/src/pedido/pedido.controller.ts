@@ -1,16 +1,21 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseIntPipe, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { PedidoService } from './pedido.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { PedidoResponseDto } from './dto/pedidoResponseDto';
 import { Pedido } from './entities/pedido.entity';
 import { CreateItemPedidoDto } from '../itemPedido/dto/createItemPedidoDto';
 import { FormaPagamentoDto } from 'src/pagamento/dto/formaPagamentoDto';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
+import { Roles } from 'src/auth/roles/roles.decorator';
 
 @Controller('pedidos')
 export class PedidoController {
   constructor(private readonly pedidoService: PedidoService) {}
 
   @Post('consumidor/:consumidorId/loja/:lojaId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('consumidor')
   async create(
     @Param('consumidorId', ParseIntPipe) consumidorId: number,
     @Param('lojaId', ParseIntPipe) lojaId: number,
@@ -21,6 +26,8 @@ export class PedidoController {
   }
 
   @Post(':pedidoId/itens/:produtoId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('consumidor')
   async adicionarItem(
     @Param('pedidoId', ParseIntPipe) pedidoId: number,
     @Param('produtoId', ParseIntPipe) produtoId: number,
@@ -31,12 +38,16 @@ export class PedidoController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   async findAll(): Promise<PedidoResponseDto[]> {
     const pedidos = await this.pedidoService.findAll();
     return pedidos.map(p => this.mapToDto(p));
   }
 
   @Get('consumidor/:consumidorId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('consumidor')
   async findByConsumidor(
     @Param('consumidorId', ParseIntPipe) consumidorId: number,
   ): Promise<PedidoResponseDto[]> {
@@ -45,6 +56,8 @@ export class PedidoController {
   }
 
   @Patch(':pedidoId/entregador/:entregadorId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('loja', 'admin')
   @HttpCode(HttpStatus.NO_CONTENT)
   async atribuirEntregador(
     @Param('pedidoId', ParseIntPipe)           pedidoId: number,
@@ -57,6 +70,8 @@ export class PedidoController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('consumidor')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: CreatePedidoDto,
@@ -66,6 +81,8 @@ export class PedidoController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('consumidor')
   async remove(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
@@ -73,6 +90,8 @@ export class PedidoController {
   }
 
   @Delete(':pedidoId/itens/:itemId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('consumidor')
   async removerItem(
     @Param('pedidoId', ParseIntPipe) pedidoId: number,
     @Param('itemId', ParseIntPipe) itemId: number,

@@ -1,11 +1,16 @@
 // src/pagamento/pagamento.controller.ts
-import {Controller, Post, Param, Body, ParseIntPipe,} from '@nestjs/common';
+import {Controller, Post, Param, Body, ParseIntPipe, UseGuards,} from '@nestjs/common';
 import { PagamentoService } from './pagamento.service';
 import { FormaPagamentoDto } from './dto/formaPagamentoDto';
 import { PedidoResponseDto } from 'src/pedido/dto/pedidoResponseDto';
 import { PagamentoResponseDto } from './dto/PagamentoResponseDto';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
+import { Roles } from 'src/auth/roles/roles.decorator';
   
   @Controller('pagamentos')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('consumidor')
   export class PagamentoController {
     constructor(private readonly pagamentoService: PagamentoService) {}
   

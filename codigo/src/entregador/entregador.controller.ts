@@ -45,7 +45,7 @@ export class EntregadorController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'entregador')
   async findOne(@Param('id') id: number): Promise<EntregadorResponseDto> {
     const entregador = await this.entregadorService.findOne(id);
     return {
@@ -88,7 +88,7 @@ export class EntregadorController {
 
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'entregador')
   async update(
     @Param('id') id: number,
     @Body() updateEntregadorDto: CreateEntregadorDto,
@@ -106,7 +106,7 @@ export class EntregadorController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'entregador')
   async remove(@Param('id') id: number): Promise<void> {
     await this.entregadorService.remove(id);
   }

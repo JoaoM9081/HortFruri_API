@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseArrayPipe, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseArrayPipe, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { EstoqueService } from './estoque.service';
 import { CreateEstoqueDto } from './dto/create-estoque.dto';
 import { ProdutoService } from '../produto/produto.service';
@@ -6,8 +6,13 @@ import { LojaService } from '../loja/loja.service';
 import { EstoqueResponseDto } from './dto/EstoqueResponseDto';
 import { ProdutoNomeDto } from './dto/ProdutoNomeDto';
 import { EstoqueDecrementarDto } from './dto/EstoqueDecrementarDto';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
+import { Roles } from 'src/auth/roles/roles.decorator';
 
 @Controller('estoques')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin', 'loja')
 export class EstoqueController {
   constructor(
     private readonly estoqueService: EstoqueService,

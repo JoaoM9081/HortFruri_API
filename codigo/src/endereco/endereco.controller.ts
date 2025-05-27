@@ -8,12 +8,12 @@ import { RolesGuard } from 'src/auth/roles/roles.guard';
 import { Roles } from 'src/auth/roles/roles.decorator';
 
 @Controller('enderecos')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('consumidor', 'loja')
 export class EnderecoController {
   constructor(private readonly enderecoService: EnderecoService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'consumidor', 'loja')
   async create(@Body() createEnderecoDto: CreateEnderecoDto): Promise<EnderecoResponseDto> {
     const endereco = await this.enderecoService.create(createEnderecoDto);
     return {
@@ -26,6 +26,8 @@ export class EnderecoController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   async findAll(): Promise<EnderecoResponseDto[]> {
     const enderecos = await this.enderecoService.findAll();
     return enderecos.map((endereco) => ({
@@ -38,6 +40,8 @@ export class EnderecoController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'consumidor', 'loja')
   async findOne(@Param('id') id: number): Promise<EnderecoResponseDto> {
     const endereco = await this.enderecoService.findOne(id);
     return {
@@ -50,6 +54,8 @@ export class EnderecoController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'consumidor', 'loja')
   async update(
     @Param('id') id: number,
     @Body() updateEnderecoDto: UpdateEnderecoDto,
@@ -65,6 +71,8 @@ export class EnderecoController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'consumidor', 'loja')
   async remove(@Param('id') id: number): Promise<void> {
     await this.enderecoService.remove(id);
   }

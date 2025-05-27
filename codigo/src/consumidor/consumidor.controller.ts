@@ -32,7 +32,7 @@ export class ConsumidorController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'consumidor')
   async findOne(@Param('id') id: number): Promise<ConsumidorResponseDto> {
     const consumidor = await this.consumidorService.findOne(id);
     return {
@@ -45,7 +45,7 @@ export class ConsumidorController {
 
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'consumidor')
   async update(@Param('id') id: number, @Body() dto: CreateConsumidorDto): Promise<ConsumidorResponseDto> {
     const consumidor = await this.consumidorService.update(id, dto);
     return {
@@ -58,7 +58,7 @@ export class ConsumidorController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'consumidor')
   async remove(@Param('id') id: number): Promise<void> {
     await this.consumidorService.remove(id);
   }
