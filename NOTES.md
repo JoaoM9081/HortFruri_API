@@ -8,8 +8,8 @@
 ---
 
 ## 🎬 Introdução
-Aplicação desenvolvida em **NestJS** para gerenciar um sistema de hortifruti, com 11 entidades principais: **Loja**, **Categoria**, **Produto**, **Estoque**, **Cliente**, **Pedido**, **ItemPedido**, **Pagamento**, **Endereço**, **Telefone** e **Carrinho**.  
-Utiliza **TypeORM** com banco de dados **SQLite**, seguindo boas práticas REST, implementando relacionamentos corretos, validações robustas e integração com Swagger para documentação.
+Aplicação desenvolvida em **NestJS** para gerenciar um sistema de hortifruti, com 13 entidades principais: **Loja**, **Categoria**, **Produto**, **Estoque**, **Consumidor**, **Pedido**, **ItemPedido**, **Pagamento**, **Endereco**, **Avaliacao**, **Auth**, **Entregador** e **Usuario**.  
+Utiliza **TypeORM** com banco de dados **SQLite**, seguindo boas práticas REST, implementando relacionamentos corretos, validações robustas, integração com Swagger para documentação, Uploads de imagens em **Produto** e **Loja** e autenticação com Cookies, tendo usuários como: (Consumidor, Entregador, Loja e ADMIN).
 
 
 ---
@@ -19,11 +19,23 @@ Utiliza **TypeORM** com banco de dados **SQLite**, seguindo boas práticas REST,
 ```bash
 git clone https://github.com/JoaoM9081/HortFruri_API
 cd codigo 
-npm i -g @nestjs/cli
 npm install
 npm run start:dev
 ```
---
+---
+
+## 🌐 Endpoint da documentação
+A documentação da API pode ser acessada em:
+```bash
+ http://localhost:3000/api
+```
+
+Endpoint para verificar imagens de uploads em:
+```bash
+ http://localhost:3000/uploads/url_imagem
+```
+
+---
 
 ## 🗃️ TypeORM e SQLite
 
@@ -37,63 +49,13 @@ TypeOrmModule.forRoot({
   synchronize: true,
 }),
 ```
-Relacionamentos principais:
-
-- Loja → Produto (OneToMany)
-
-- Categoria → Produto (OneToMany)
-
-- Produto → Estoque (OneToOne)
-
-- Cliente → Endereço (OneToMany)
-
-- Cliente → Telefone (OneToMany)
-
-- Cliente → Pedido (OneToMany)
-
-- Pedido → ItemPedido (OneToMany)
-
-- ItemPedido → Produto (ManyToOne)
-
-- Pedido → Pagamento (OneToOne)
-
-- Cliente → Carrinho (OneToOne)
-
-- Carrinho → ItemPedido (OneToMany)
-
----
-
-## 🧠 Lógica nas Services
-
-- Produto: busca com loja, categoria e estoque.
-
-- Pedido: calcula o total com base nos itens e preço unitário.
-
-- Pagamento: validação do status para finalizar pedido.
-
-- Estoque: decrementar apenas se houver saldo suficiente.
-
-- Carrinho: gerencia os itens adicionados antes do pedido final.
-
-- Cliente: gerencia múltiplos endereços e telefones.
-
-- Erros tratados com:
-
-- NotFoundException
-
-- BadRequestException
-
-- ConflictException
-
-- Mensagens personalizadas para melhor compreensão.
-
----
 
 ## 🧪 Boas práticas REST
 
 - DTOs organizados e validados
 - Controllers com separação de responsabilidades
 - Retorno de erros amigáveis
+- Autenticação
 - Códigos HTTP adequados (ex: 409, 404)
 - Integração com Swagger:
 
@@ -104,18 +66,3 @@ const config = new DocumentBuilder()
   .setVersion('1.0')
   .build();
 ```
-
----
-
-## 🌐 Endpoint da documentação
-A documentação da API pode ser acessada em:
-```bash
- http://localhost:3000/api
-```
----
-
-## 🎯 Desafio!
-
-- Tratar erros de banco com mensagens personalizadas
-- Aplicar validações nos dados de entradas
-- Melhorar a documentação com o Swagger

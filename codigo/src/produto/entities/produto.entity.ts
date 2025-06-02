@@ -28,4 +28,7 @@ export class Produto {
   
     @OneToMany(() => ItemPedido, item => item.produto)
     itensPedido: ItemPedido[];
+
+    @Column({ nullable: true })
+    imagemUrl?: string;
   }

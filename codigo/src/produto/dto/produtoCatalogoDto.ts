@@ -4,4 +4,5 @@ export class ProdutoCatalogoDto {
     preco: number;
     categoria: string;
     quantidadeDisponivel: number;
+    imagemUrl?: string;
   }

@@ -5,6 +5,8 @@ import { Produto } from './entities/produto.entity';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { Loja } from 'src/loja/entities/loja.entity';
 import { Categoria } from 'src/categoria/entities/categoria.entity';
+import { join } from 'path';
+import { unlink } from 'fs/promises';
 
 @Injectable()
 export class ProdutoService {
@@ -42,6 +44,29 @@ export class ProdutoService {
     return this.findOne(salvo.id);
   }
 
+  async atualizarImagem(id: number, imagemUrl: string): Promise<Produto> {
+    const produto = await this.repo.findOne({ where: { id } });
+    if (!produto) {
+      throw new NotFoundException(`Produto ${id} não encontrado`);
+    }
+
+    if (produto.imagemUrl) {
+      const nomeArquivoAntigo = produto.imagemUrl.replace(/^\/uploads\//, '');
+      const caminhoArquivoAntigo = join(process.cwd(), 'uploads', nomeArquivoAntigo);
+      try {
+        await unlink(caminhoArquivoAntigo);
+      } catch {
+      }
+    }
+
+    await this.repo.update(id, { imagemUrl });
+
+    const atualizado = await this.repo.findOne({ where: { id } });
+    if (!atualizado) {
+      throw new NotFoundException(`Produto ${id} não encontrado após atualização`);
+    }
+    return atualizado;
+  }
 
   findAll(): Promise<Produto[]> {
     return this.repo.find({ relations: ['loja', 'categoria', 'estoques'] });

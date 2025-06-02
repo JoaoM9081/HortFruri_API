@@ -23,6 +23,9 @@ export class Loja {
 
     @Column()
     senha: string;  
+
+    @Column({ nullable: true })
+    imagemUrl?: string;
   
     @ManyToOne(() => Endereco, { eager: true, onDelete: 'CASCADE' })
     @JoinColumn({ name: 'enderecoId' })

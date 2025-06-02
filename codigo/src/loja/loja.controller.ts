@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, Put, ParseIntPipe, UseGuards, UseInterceptors, BadRequestException, HttpCode, HttpStatus, UploadedFile } from '@nestjs/common';
 import { LojaService } from './loja.service';
 import { CreateLojaDto } from './dto/create-loja.dto';
 import { LojaResponseDto } from './dto/LojaResponseDto';
@@ -6,6 +6,10 @@ import { UpdateLojaDto } from './dto/update-loja.dto';
 import { JwtAuthGuard } from 'src/auth/guards/JwtAuthGuard';
 import { RolesGuard } from 'src/auth/roles/roles.guard';
 import { Roles } from 'src/auth/roles/roles.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { ApiBody, ApiConsumes, ApiResponse } from '@nestjs/swagger';
+import { extname } from 'path';
 
 @Controller('lojas')
 export class LojaController {
@@ -48,6 +52,58 @@ export class LojaController {
     return this.toResponse(loja);
   }
 
+  @Patch(':id/imagem')
+    @UseInterceptors(
+      FileInterceptor('imagem', {
+        storage: diskStorage({
+          destination: './uploads',
+          filename: (_req, file, cb) => {
+            const name = file.originalname.split('.')[0];
+            const fileExt = extname(file.originalname);
+            const timestamp = Date.now();
+            cb(null, `${name}-${timestamp}${fileExt}`);
+          },
+        }),
+        fileFilter: (_req, file, cb) => {
+          if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+            return cb(new BadRequestException('Apenas imagens JPG/PNG são permitidas'), false);
+          }
+          cb(null, true);
+        },
+        limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
+      })
+    )
+    @ApiConsumes('multipart/form-data')
+    @ApiResponse({ status: 200, description: 'Imagem enviada com sucesso.' })
+    @ApiBody({
+      schema: {
+        type: 'object',
+        properties: {
+          imagem: {
+            type: 'string',
+            format: 'binary',
+            description: 'Arquivo JPG/PNG a ser enviado.',
+          },
+        },
+        required: ['imagem'],
+      },
+    })
+    @HttpCode(HttpStatus.OK)
+    async uploadImagem(
+      @Param('id', ParseIntPipe) id: number,
+      @UploadedFile() imagem: Express.Multer.File,
+    ): Promise<{ mensagem: string }> {
+      if (!imagem) {
+        throw new BadRequestException('É necessário enviar um arquivo de imagem.');
+      }
+  
+      const imagemUrl = `/uploads/${imagem.filename}`;
+  
+      await this.lojaService.atualizarImagem(id, imagemUrl);
+  
+      return { mensagem: `Imagem da loja ${id} atualizada com sucesso.` };
+    }
+
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin', 'loja')	
@@ -72,6 +128,7 @@ export class LojaController {
         cidade:    loja.endereco.cidade,
         cep:       loja.endereco.cep,
       },
+      imagemUrl: loja.imagemUrl,
     };
   }
 }

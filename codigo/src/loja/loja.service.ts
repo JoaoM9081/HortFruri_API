@@ -6,6 +6,8 @@ import { CreateLojaDto } from './dto/create-loja.dto';
 import { Endereco } from 'src/endereco/entities/endereco.entity';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import * as bcrypt from 'bcrypt';
+import { join } from 'path';
+import { unlink } from 'fs/promises';
 
 @Injectable()
 export class LojaService {
@@ -103,6 +105,30 @@ export class LojaService {
   async remove(id: number): Promise<void> {
     await this.repo.delete(id);
   }
+
+  async atualizarImagem(id: number, imagemUrl: string): Promise<Loja> {
+      const loja = await this.repo.findOne({ where: { id } });
+      if (!loja) {
+        throw new NotFoundException(`Loja ${id} não encontrada`);
+      }
+  
+      if (loja.imagemUrl) {
+        const nomeArquivoAntigo = loja.imagemUrl.replace(/^\/uploads\//, '');
+        const caminhoArquivoAntigo = join(process.cwd(), 'uploads', nomeArquivoAntigo);
+        try {
+          await unlink(caminhoArquivoAntigo);
+        } catch {
+        }
+      }
+  
+      await this.repo.update(id, { imagemUrl });
+  
+      const atualizado = await this.repo.findOne({ where: { id } });
+      if (!atualizado) {
+        throw new NotFoundException(`Loja ${id} não encontrada`);
+      }
+      return atualizado;
+    }
 
   async findByName(nome: string): Promise<Loja> {
    

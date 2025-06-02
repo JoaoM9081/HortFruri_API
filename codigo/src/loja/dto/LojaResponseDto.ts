@@ -12,5 +12,6 @@ export class LojaResponseDto {
         cidade: string;
         cep: string;
     };
+    imagemUrl?: string;
   }
   
