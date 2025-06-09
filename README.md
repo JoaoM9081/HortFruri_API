@@ -24,6 +24,16 @@ npm run start:dev
 ```
 ---
 
+## ⚙️ Criando arquivo .env 
+Copie o conteudo dentro do arquivo .envExample e altere os valores das variáveis
+
+Exemplo:
+```bash
+JWT_SECRET=password123
+JWT_EXPIRES_IN=20m #tempo em segundos ou minutos
+```
+---
+
 ## 🌐 Endpoint da documentação
 A documentação da API pode ser acessada em:
 ```bash
