@@ -1,0 +1,407 @@
+:root {
+  --green-dark:   #006400;   /* verde escuro */
+  --green-light:  #e8f5e9;   /* verde claro para fundo */
+  --gray-light:   #a4d1a8;   /* cinza claro para header */
+}
+
+/* RESET & BASE */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: sans-serif;
+  background-color: var(--green-light);
+  color: var(--green-dark);
+}
+
+/* CONTAINER GERAL */
+.hf-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.hf-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;                       /* ligeiramente maior */
+  padding: 0 2rem;
+  background-color: var(--gray-light);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hf-header__brand {
+  display: flex;
+  align-items: center;
+}
+
+.hf-header__logo {
+  height: 40px;
+  width: auto;
+}
+
+.hf-header__brand-name {
+  margin-left: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+.hf-header__nav a {
+  margin: 0 1.5rem;
+  text-decoration: none;
+  font-size: 1.1rem;
+  color: var(--color-text);
+  transition: color .2s;
+}
+
+.hf-header__nav a:hover {
+  color: var(--color-primary);
+}
+
+.hf-header__actions .btn {
+  padding: 0.6rem 1.8rem;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+}
+
+.btn--enter {
+  background-color: var(--color-primary);
+  color: white;
+  background-color: #1b5e20;
+  border-radius: 999px; /* botão totalmente arredondado */
+  transition: background-color .2s;
+  text-decoration: none;
+}
+
+.btn--enter:hover {
+  background-color: #37913b;
+}
+
+/* MAIN HERO */
+.hf-main {
+  flex: 1;
+  padding: 2rem;
+  text-align: center;
+}
+
+.hf-main h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.hf-main p {
+  opacity: 0.8;
+  margin-bottom: 2rem;
+}
+
+.hf-main .hero-img {
+  display: block;
+  margin: 0 auto 2rem;
+  width: 100%;
+  max-width: 600px;
+  height: 300px;
+  background-color: transparent;
+  background-image: url('/hero-placeholder.png');
+  background-size: cover;
+  background-position: center;
+}
+
+/* CATEGORIES */
+.hf-categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.hf-categories .card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100px;
+}
+
+.hf-categories .card .icon {
+  width: 80px;
+  height: 80px;
+  background-color: var(--green-dark);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 50%;
+  border-radius: 50%;
+  margin-bottom: 0.5rem;
+  transition: transform 0.2s;
+}
+
+.hf-categories .card .icon:hover {
+  transform: scale(1.1);
+}
+
+/* ícones por categoria */
+.hf-categories .card.ofertas  .icon { background-image: url('/ofertas.png');  }
+.hf-categories .card.frutas   .icon { background-image: url('/frutas.png');   }
+.hf-categories .card.vegetais .icon { background-image: url('/vegetais.png'); }
+.hf-categories .card.graos    .icon { background-image: url('/graos.png');    }
+
+.hf-categories .card span {
+  color: var(--green-dark);
+  font-weight: 500;
+}
+
+/* FOOTER */
+.hf-footer {
+  background-color: var(--green-dark);
+  color: white;
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.9rem;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+  .hf-header {
+    flex-direction: column;
+    height: auto;
+    padding: 1rem;
+  }
+  .hf-header nav {
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .hf-header .btn-entrar {
+    margin-top: 0.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .hf-main h1 {
+    font-size: 1.8rem;
+  }
+  .hf-categories {
+    gap: 1rem;
+  }
+}
+
+/* src/Views/Login.css */
+.login-content {
+  flex: 1;                     /* ocupa todo o espaço entre header e footer */
+  display: flex;               
+  align-items: center;         /* centra verticalmente */
+  justify-content: center;     /* centra horizontalmente */
+  padding: 2rem;
+}
+
+.login-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  margin: auto;
+  transform: translateY(-20px);
+}
+
+.login-card h2 {
+  margin-bottom: 1.5rem;
+  color: var(--green-dark);
+  font-size: 1.8rem;
+}
+
+.login-error {
+  color: #c00;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.login-form label {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  font-weight: 500;
+  color: var(--green-dark);
+}
+
+.login-form input {
+  padding: 0.65rem 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.2s;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: var(--green-dark);
+}
+
+.login-btn {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  font-size: 1.05rem;
+  background-color: var(--green-dark);
+  border-radius: 8px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.login-btn:disabled {
+  background-color: #95a89c;
+  cursor: default;
+}
+
+.login-btn:not(:disabled):hover {
+  background-color: #004d00;
+}
+
+.login-links {
+  margin-top: 1rem;
+}
+
+.login-register {
+  font-size: 0.95rem;
+  color: var(--green-dark);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.login-register:hover {
+  opacity: 0.7;
+}
+
+/* src/Views/RegisterLoja.css */
+
+/* Container principal */
+.register-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background-color: var(--green-light);
+}
+
+/* Card de cadastro mais largo */
+.register-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  width: 100%;
+  max-width: 680px;   /* aumentou de 400px para 680px */
+  text-align: center;
+}
+
+/* Título */
+.register-card h2 {
+  margin-bottom: 1.5rem;
+  color: var(--green-dark);
+  font-size: 1.8rem;
+}
+
+/* Mensagem de erro */
+.login-error {
+  color: #c00;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Formulário em grid 2-colunas */
+.register-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+/* Rótulo de cada campo */
+.register-form label {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  font-weight: 500;
+  color: var(--green-dark);
+}
+
+/* Inputs, inclusive o file */
+.register-form input[type="text"],
+.register-form input[type="email"],
+.register-form input[type="password"],
+.register-form input[type="tel"],
+.register-form input[type="file"] {
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.2s;
+}
+
+.register-form input:focus {
+  outline: none;
+  border-color: var(--green-dark);
+}
+
+/* Fieldset de endereço ocupa duas colunas */
+.address-fieldset {
+  grid-column: 1 / -1;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.address-fieldset legend {
+  padding: 0 0.5rem;
+  color: var(--green-dark);
+  font-weight: 600;
+}
+
+/* Campo de upload ocupa duas colunas */
+.register-form input[type="file"] {
+  grid-column: 1 / -1;
+}
+
+/* Botão de envio ocupa duas colunas */
+.register-btn {
+  grid-column: 1 / -1;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  font-size: 1.05rem;
+  background-color: var(--green-dark);
+  border-radius: 8px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.register-btn:disabled {
+  background-color: #95a89c;
+  cursor: default;
+}
+
+.register-btn:not(:disabled):hover {
+  background-color: #004d00;
+}
+
+/* Responsivo: se não couber duas colunas, vira uma só */
+@media (max-width: 640px) {
+  .register-form {
+    grid-template-columns: 1fr;
+  }
+}

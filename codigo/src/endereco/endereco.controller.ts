@@ -12,8 +12,6 @@ export class EnderecoController {
   constructor(private readonly enderecoService: EnderecoService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'consumidor', 'loja')
   async create(@Body() createEnderecoDto: CreateEnderecoDto): Promise<EnderecoResponseDto> {
     const endereco = await this.enderecoService.create(createEnderecoDto);
     return {
