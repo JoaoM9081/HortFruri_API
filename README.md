@@ -12,7 +12,7 @@
 
 Aplicação full‑stack para gerenciar um sistema de hortifruti. O **backend**, desenvolvido em **NestJS**, expõe endpoints REST para as seguintes entidades: Loja, Categoria, Produto, Estoque, Consumidor, Pedido, ItemPedido, Pagamento, Endereço, Avaliação, Auth, Entregador e Usuário. A persistência é feita com **TypeORM** em **SQLite**, com validações via **class-validator**, autenticação baseada em **cookies** e documentação automática via **Swagger**. Também suportamos upload de imagens para Produtos e Lojas.
 
-O **frontend**, criado em **React**, consome essa API, apenas a parte de Loja e Auth, exibindo telas de cadastro, login e home.
+O **frontend**, criado em **React**, consome a API, exibindo telas de cadastro, login e home de (Loja).
 
 ---
 
