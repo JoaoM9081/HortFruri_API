@@ -131,4 +131,14 @@ export class LojaController {
       imagemUrl: loja.imagemUrl,
     };
   }
+
+  @Get('email/:email')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'loja')
+  async findByEmail(
+    @Param('email') email: string,
+  ): Promise<LojaResponseDto> {
+    const loja = await this.lojaService.findByEmail(email);
+    return this.toResponse(loja);
+  }
 }

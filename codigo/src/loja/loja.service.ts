@@ -144,4 +144,16 @@ export class LojaService {
 
     return loja;
   }
+
+  async findByEmail(email: string): Promise<Loja> {
+    const loja = await this.repo.findOne({
+      where: { email },
+      relations: ['endereco', 'produtos', 'pedidos']
+    });
+
+    if (!loja) {
+      throw new NotFoundException(`Loja com e-mail ${email} não encontrada`);
+    }
+    return loja;
+  }
 }

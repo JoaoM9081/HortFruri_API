@@ -81,6 +81,102 @@ html, body, #root {
   background-color: #37913b;
 }
 
+/* HEADER */
+.hf-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  padding: 0 2rem;
+  background-color: var(--gray-light);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hf-header__brand {
+  display: flex;
+  align-items: center;
+}
+
+.hf-header__logo {
+  height: 40px;
+  width: auto;
+}
+
+.hf-header__brand-name {
+  margin-left: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+.hf-header__nav a {
+  margin: 0 1.5rem;
+  text-decoration: none;
+  font-size: 1.1rem;
+  color: var(--color-text);
+  transition: color .2s;
+}
+
+.hf-header__nav a:hover {
+  color: var(--color-primary);
+}
+
+/* garante que logo + botão fiquem alinhados */
+.hf-header__actions {
+  display: flex;
+  align-items: center;
+}
+
+/* Avatar maior e com borda verde */
+.hf-header__user-logo {
+  width: 45px;               /* ficou um pouco maior */
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--green-dark); /* usou o verde escuro */
+  background-color: rgb(136, 189, 136);
+  margin-right: 0.75rem;
+}
+
+/* destaca o link ativo */
+.hf-header__nav a.active-link {
+  color: #000;        /* link preto */
+}
+
+
+/* botão “Entrar” */
+.hf-header__actions .btn--enter {
+  padding: 0.6rem 1.8rem;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  background-color: #1b5e20;
+  color: white;
+  border-radius: 999px;
+  transition: background-color .2s;
+  text-decoration: none;
+}
+
+.hf-header__actions .btn--enter:hover {
+  background-color: #37913b;
+}
+
+.btn--exit {
+  display: inline-block;
+  font-size: 1.1rem;
+  background-color: #1b5e20;  /* mesmo verde */
+  color: white;
+  border: none;
+  border-radius: 999px;       /* totalmente arredondado */
+  cursor: pointer;
+  transition: background-color .2s;
+  text-decoration: none;
+}
+.btn--exit:hover {
+  background-color: #37913b;  /* mesmo hover */
+}
+
+
 /* MAIN HERO */
 .hf-main {
   flex: 1;
@@ -297,14 +393,14 @@ html, body, #root {
   background-color: var(--green-light);
 }
 
-/* Card de cadastro mais largo */
+/* Card de cadastro */
 .register-card {
-  background: white;
+  background: #fff;
   padding: 2.5rem;
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
   width: 100%;
-  max-width: 680px;   /* aumentou de 400px para 680px */
+  max-width: 600px;  /* reduzi um pouco para ficar mais focado */
   text-align: center;
 }
 
@@ -317,9 +413,14 @@ html, body, #root {
 
 /* Mensagem de erro */
 .login-error {
+  background: #fdecea;
   color: #c00;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
   margin-bottom: 1rem;
+  text-align: left;
   font-size: 0.9rem;
+  border-left: 4px solid #c00;
 }
 
 /* Formulário em grid 2-colunas */
@@ -329,46 +430,59 @@ html, body, #root {
   gap: 1rem;
 }
 
-/* Rótulo de cada campo */
+/* Labels: flex com gap */
 .register-form label {
   display: flex;
   flex-direction: column;
+  gap: 0.4rem;
   text-align: left;
   font-weight: 500;
   color: var(--green-dark);
 }
 
-/* Inputs, inclusive o file */
+/* Inputs: largura total e caixa-borda */
 .register-form input[type="text"],
 .register-form input[type="email"],
 .register-form input[type="password"],
 .register-form input[type="tel"],
 .register-form input[type="file"] {
+  width: 100%;
+  box-sizing: border-box;
   padding: 0.6rem;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 6px;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .register-form input:focus {
   outline: none;
   border-color: var(--green-dark);
+  box-shadow: 0 0 0 3px rgba(0, 77, 0, 0.1);
 }
 
-/* Fieldset de endereço ocupa duas colunas */
+/* Fieldset de endereço: grid interno */
 .address-fieldset {
-  grid-column: 1 / -1;
+  grid-column: 1 / -1;            /* ocupa todo o form */
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 1rem;
-  margin: 1rem 0;
+  margin: 1rem 0 0;
+  display: grid;
+  /* duas colunas de pelo menos 200px, expande até preencher */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
 .address-fieldset legend {
   padding: 0 0.5rem;
   color: var(--green-dark);
   font-weight: 600;
+}
+
+/* Faz o primeiro label (Rua) ocupar as duas colunas */
+.address-fieldset > label:first-of-type {
+  grid-column: 1 / -1;
 }
 
 /* Campo de upload ocupa duas colunas */
@@ -379,7 +493,7 @@ html, body, #root {
 /* Botão de envio ocupa duas colunas */
 .register-btn {
   grid-column: 1 / -1;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   padding: 0.75rem;
   font-size: 1.05rem;
   background-color: var(--green-dark);
@@ -405,3 +519,4 @@ html, body, #root {
     grid-template-columns: 1fr;
   }
 }
+
