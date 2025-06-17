@@ -16,6 +16,11 @@ O **frontend**, criado em **React**, consome a API, exibindo telas de cadastro, 
 
 ---
 
+## 📽️Explicação do projeto
+
+Vídeo explicativo do projeto: https://www.youtube.com/watch?v=JuNb1w9UvFA
+
+
 ## 📂 Estrutura de Pastas
 
 ```
