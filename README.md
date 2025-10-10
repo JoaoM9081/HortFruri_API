@@ -1,13 +1,5 @@
 # 📝 README — Atividade CRUD Hortifruti
 
-## 👥 Integrantes
-
-* João Marcos Azevedo Cruz – UC23100741
-* João Pedro Tavares – UC23100608
-* João Victor Martins – UC23111040
-
----
-
 ## 🎬 Introdução
 
 Aplicação full‑stack para gerenciar um sistema de hortifruti. O **backend**, desenvolvido em **NestJS**, expõe endpoints REST para as seguintes entidades: Loja, Categoria, Produto, Estoque, Consumidor, Pedido, ItemPedido, Pagamento, Endereço, Avaliação, Auth, Entregador e Usuário. A persistência é feita com **TypeORM** em **SQLite**, com validações via **class-validator**, autenticação baseada em **cookies** e documentação automática via **Swagger**. Também suportamos upload de imagens para Produtos e Lojas.
