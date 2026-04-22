@@ -1,108 +1,124 @@
-# 📝 README — Atividade CRUD Hortifruti
+# README - CRUD Hortifruti
 
-## 🎬 Introdução
+## Visao geral
 
-Aplicação full‑stack para gerenciar um sistema de hortifruti. O **backend**, desenvolvido em **NestJS**, expõe endpoints REST para as seguintes entidades: Loja, Categoria, Produto, Estoque, Consumidor, Pedido, ItemPedido, Pagamento, Endereço, Avaliação, Auth, Entregador e Usuário. A persistência é feita com **TypeORM** em **SQLite**, com validações via **class-validator**, autenticação baseada em **cookies** e documentação automática via **Swagger**. Também suportamos upload de imagens para Produtos e Lojas.
+Projeto full-stack para gerenciamento de um sistema de hortifruti.
 
-O **frontend**, criado em **React**, consome a API, exibindo telas de cadastro, login e home de (Loja).
+- Backend: NestJS + TypeORM + PostgreSQL
+- Frontend: React + Vite
+- Autenticacao: JWT + cookies
+- Documentacao da API: Swagger
+- Uploads: imagens de produtos e lojas
 
----
+## Estrutura
 
-## 📂 Estrutura de Pastas
-
+```text
+.
+|-- codigo/      # Backend NestJS
+|-- frontEnd/    # Frontend React
+`-- README.md
 ```
-├─ codigo/        # Backend NestJS
-├─ frontEnd/      # Frontend React
-├─ README.md      # Este arquivo
-└─ .gitignore
+
+## Backend
+
+### 1. Instalar dependencias
+
+```bash
+cd codigo
+npm install
 ```
 
----
+### 2. Configurar ambiente
 
-## ⚙️ Executando o Backend
+Copie `.envExample` para `.env` e ajuste os valores. Exemplo de configuracao para o Postgres do `docker-compose.yml`:
 
-1. Clone o repositório e navegue até a pasta do backend:
+```env
+JWT_SECRET=password123
+JWT_EXPIRES_IN=20m
 
-   ```bash
-   git clone https://github.com/JoaoM9081/HortFruri_API.git
-   cd codigo
-   ```
-2. Instale as dependências:
+DB_URL=jdbc:postgresql://localhost:5435/postgresdb
+DB_USER=postgres
+DB_PASSWORD=postgres
 
-   ```bash
-   npm install
-   ```
-3. Configure as variáveis de ambiente copiando `.envExample` para `.env` e alterando os valores conforme necessário. Exemplo:
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=postgresdb
 
-   ```env
-   JWT_SECRET=password123
-   JWT_EXPIRES_IN=20m
-   ```
-4. Inicie em modo de desenvolvimento:
+PGADMIN_DEFAULT_EMAIL=admin@admin.com
+PGADMIN_DEFAULT_PASSWORD=admin
+```
 
-   ```bash
-   npm run start:dev
-   ```
+Tambem e possivel usar `DB_HOST`, `DB_PORT` e `DB_NAME` em vez de `DB_URL`.
 
-### 🌐 Documentação API
+### 3. Subir o banco com Docker
 
-* **Swagger**: `http://localhost:3000/api`
-* **Uploads**: `http://localhost:3000/uploads/<nome_do_arquivo>`
+```bash
+docker compose up -d
+```
 
----
+Servicos expostos:
 
-## ⚙️ Executando o Frontend
+- PostgreSQL: `localhost:5435`
+- pgAdmin: `http://localhost:15434`
 
-1. Em outra aba/terminal, navegue até a pasta do frontend:
+### 4. Rodar o backend
 
-   ```bash
-   cd frontEnd
-   ```
-2. Instale as dependências:
+```bash
+npm run start:dev
+```
 
-   ```bash
-   npm install
-   ```
-3. Ajuste o `VITE_API_BASE_URL` no arquivo `.env` (ou `.env.local`) para apontar ao backend, por exemplo:
+Swagger:
 
-   ```env
-   VITE_API_BASE_URL=http://localhost:3000
-   ```
-4. Inicie a aplicação:
+- `http://localhost:3000/api`
 
-   ```bash
-   npm run dev
-   ```
-5. Acesse no navegador: `http://localhost:5173`.
+Uploads:
 
----
+- `http://localhost:3000/uploads/<arquivo>`
 
-## 🗃️ Configuração TypeORM (Backend)
+### Persistencia
+
+O backend usa `TypeOrmModule.forRootAsync` com `type: 'postgres'`.
+
+As tabelas sao criadas automaticamente a partir das entidades carregadas pelo TypeORM com:
 
 ```ts
-TypeOrmModule.forRoot({
-  type: 'sqlite',
-  database: 'banco.sqlite',
-  entities: [__dirname + '/**/*.entity{.ts,.js}'],
-  synchronize: true,
-});
+autoLoadEntities: true,
+synchronize: true,
 ```
 
----
+## Testes do backend
 
-## 🧪 Boas práticas adotadas
+```bash
+npm test
+npm run test:e2e
+```
 
-* **DTOs** organizados e validados com `class-validator`
-* **Controllers** com responsabilidades bem definidas
-* Tratamento de erros com respostas amigáveis
-* Autenticação e autorização com **JWT** + **cookies**
-* Uso de códigos HTTP corretos (`201`, `400`, `401`, `403`, `404`, `409`)
-* Documentação automática via **Swagger**
+Os testes validam:
 
----
+- inicializacao do Nest
+- conexao com o PostgreSQL configurado no `.env`
+- criacao automatica das tabelas com base nas entidades mapeadas
 
-## 🛠️ Tecnologias
+## Frontend
 
-* **Backend**: NestJS, TypeORM, SQLite, class-validator, Swagger, Multer
-* **Frontend**: React, Vite, React Router, Axios
-* **Outros**: Git, Node.js
+```bash
+cd frontEnd
+npm install
+npm run dev
+```
+
+Se necessario, ajuste `VITE_API_BASE_URL` para o backend:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+Frontend local:
+
+- `http://localhost:5173`
+
+## Tecnologias
+
+- Backend: NestJS, TypeORM, PostgreSQL, Swagger, Multer
+- Frontend: React, Vite, React Router, Axios
+- Infra local: Docker, PostgreSQL, pgAdmin
